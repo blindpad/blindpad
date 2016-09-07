@@ -1,0 +1,18 @@
+:host {
+    position: relative;
+    height: 20px;
+    width: 20px;
+
+    bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: fade-out(white, 0.6);
+    }
+
+    &.voice-active > bar {
+        background-color: red;
+    }
+}

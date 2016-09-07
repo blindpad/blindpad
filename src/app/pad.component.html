@@ -1,0 +1,130 @@
+<welcome [@fadeInOut] *ngIf="getView() == PadView.Welcome">
+    <contents>
+        <h1>blindpad is an <a href="http://www.github.com/rmnoon/blindpad">open source</a> shared peer-to-peer text editor for
+            collaborating on code and technical documents.</h1>
+        <button (click)="startAudioSetup()" *ngIf="media.needsCalibration()">Setup Audio</button>
+        <div *ngIf="!media.needsCalibration()">
+            <p *ngIf="media.isOptOut()" class="warning">You've disabled your microphone. Others in your pad won't be able to hear you. Refresh this page if your change
+                your mind.</p>
+            <p *ngIf="media.isCalibrated() && media.getCalibrationAttempts() > 0">Audio Setup successful.</p>
+            <button (click)="joinPad()">
+                <span *ngIf="hasPad()">Join <em>{{getJoinId()}}</em></span>
+                <span *ngIf="!hasPad()">Start a new pad</span>
+            </button>
+            <p class="reconfigure-prompt" *ngIf="media.isCalibrated()">You're all set. <button (click)="media.clearCalibration()" class="text invert inline">Click here</button> if you want to reset your audio settings.</p>
+        </div>
+    </contents>
+</welcome>
+<audio-setup [@fadeInOut] *ngIf="getView() == PadView.AudioSetup">
+    <contents>
+        <div [@fadeInOut] *ngIf="!media.isCalibrating() && media.needsCalibration()">
+            <h2>Audio Setup</h2>
+            <div *ngIf="media.getCalibrationAttempts() == 0">
+                <p>Please ensure your microphone is plugged in. We strongly recommended headphones.</p>
+                <p>Press the button below and read the text that appears. Press it again when you're finished.</p>
+            </div>
+            <div *ngIf="media.getCalibrationAttempts() > 0" class="warning">
+                <p>Setup unsuccessful, please check your microphone and try again.</p>
+                <p *ngIf="isChromeOnMac()">
+                    It looks like you're using Chrome on OS X. If your microphone is connected but you're not getting any input you might be
+                    hitting <a href="https://bugs.chromium.org/p/webrtc/issues/detail?id=4799">this bug</a> (which requires restarting Chrome).
+                </p>
+                <p *ngIf="media.getCalibrationAttempts() > 1">
+                    If you're still having trouble please <a href="https://github.com/rmnoon/blindpad/issues/new">open an issue</a> on Github.
+                </p>
+            </div>
+        </div>
+        <div [@fadeInOut] *ngIf="media.needsCalibration()">
+            <button class="start-button" (click)="media.setCalibrating(!media.isCalibrating())">
+                {{media.isCalibrating() ? "Stop" : "Begin"}}
+            </button>
+            <audio-monitor [analyser]="media.getLocalAnalyser()"></audio-monitor>
+            <button class="opt-out-button text invert" *ngIf="!media.isCalibrating()" (click)="optOutOfVoice()">I don't want to use voice chat.</button>
+            <phrases [@fadeInOut] *ngIf="media.isCalibrating()">
+                <p *ngFor="let phrase of media.getPhrases()">{{phrase}}</p>
+            </phrases>
+        </div>
+    </contents>
+</audio-setup>
+<about [@fadeInOut] *ngIf="getView() == PadView.About">
+    <contents>
+        <logo routerLink="/">blind<span class="primary">pad</span></logo>
+        <h2>What is Blindpad?</h2>
+        <p>Blindpad is an <a href="https://github.com/rmnoon/blindpad">open source</a> collaborative text editor (like Google
+            Docs or <a href="https://coderpad.io">CoderPad</a>) with integrated semi-anonymizing voice chat intended to help
+            reduce bias in technical communication.  In particular it can be used to extend the concept of “<a href="https://en.wikipedia.org/wiki/Blind_audition">blind auditions</a>”
+            to software programming and technical design interviews.  It is inspired by economists Claudia Goldin (Harvard)
+            and Cecilia Rouse (Princeton) who concluded in <a href="https://www.aeaweb.org/articles?id=10.1257/aer.90.4.715">their 1997 paper</a>            that the introduction of blind auditions in professional orchestras is likely responsible for about one-third
+            of the 250% increase in female membership between 1970 and the mid 1990s.</p>
+        <h2>How does it work?</h2>
+        <h3>Semi-anonymizing voice chat</h3>
+        <p>Before joining a pad the app has an simple (one-time) audio calibration screen where the user is asked to read a
+            few phrases.  During this process Blindpad attempts to measure the <a href="https://en.wikipedia.org/wiki/Fundamental_frequency">fundamental frequency</a>            of the user’s voice.  With this information Blindpad can perform a slight pitch-shift to an ambiguous frequency
+            in the range where many male and female voices overlap.  This can help reduce bias in an interview setting (potentially
+            in both directions) although <a href="http://www.ncbi.nlm.nih.gov/pubmed/22080221">studies have shown</a> that
+            pitch is not the only factor that human brains use to classify the gender of a speaker.</p>
+        <h3>Multi-way blind</h3>
+        <p>All participants in a pad are anonymized: usernames are randomly generated pseudonyms and no account sign-up is necessary.</p>
+        <h3>Peer-to-peer and ephemeral</h3>
+        <p>Blindpad users connect directly to each other using peer-to-peer technology (via the WebRTC API).  This makes Blindpad
+            fairly inexpensive to host (and thus free to use) and guarantees no intermediary exists that needs to know a
+            user’s real identity or contact information.</p>
+        <h3>Reducing “stereotype threat”</h3>
+        <p>The typical user flow avoids <a href="https://en.wikipedia.org/wiki/Stereotype_threat">stereotype threat</a> as much
+            as possible by removing the focus from the user’s identity and placing it on the workspace.  Besides the name,
+            the core app doesn’t provide any indication of a special purpose beyond similar text editors.</p>
+        <h3>No special configuration</h3>
+        <p>Applicant Tracking Systems or recruiting coordinators need only decide on a URL to share with with all parties before
+            an interview.</p>
+        <h2>How can I use Blindpad?</h2>
+        <p>A public version of Blindpad is hosted at <a href="https://rmnoon.github.io/blindpad">rmnoon.github.io/blindpad</a>.
+             Blindpad can be hosted on your own servers quite easily: you only need to serve the static content and host
+            a small (~100 line) NodeJS signaler (used for peer discovery).</p>
+        <h2>What’s the long-term goal of the project?</h2>
+        <p>The overarching goal of the project is to build a community capable of producing, hosting, and maintaining excellent
+            free tooling that reduces bias in evaluation and communication.  This is a really hard problem and while a perfect
+            solution might not be possible incremental progress is straightforward.</p>
+        <p>An important next step would be to produce (or lobby for) anonymizing plugins for popular Applicant Tracking Systems
+            (like <a href="https://www.greenhouse.io/">Greenhouse</a>, <a href="http://www.lever.co/">Lever</a>, <a href="http://www.jobvite.com/">Jobvite</a>,
+            and <a href="http://www.oracle.com/us/products/applications/taleo/enterprise/overview/index.html">Taleo</a>).
+             With sufficient resources we could also start to produce an open-source ATS designed from the ground up to anonymize
+            certain steps of the hiring process.</p>
+        <h2>How can I contribute to the project?</h2>
+        <p>If you’d like to support the project financially you can TODO. Donations will be used to upgrade the public hosted
+            version of Blindpad and to fund future development.</p>
+        <p>If you’re inclined to contribute creatively (with code or design help) feel free to check out the repository, read
+            over the project’s roadmap, and/or submit a pull request.</p>
+        <p>Lastly: if you have any ideas or feature requests on how to make the app more successful feel free to <a href="https://github.com/rmnoon/blindpad/issues/new">open an issue</a>            on Github.</p>
+        <h2>What should I do if I have a problem or run into a bug?</h2>
+        <p>For all problems please <a href="https://github.com/rmnoon/blindpad/issues/new">open an issue</a> on Github. If possible
+            please try to include simple steps to reproduce the problem.</p>
+        <h2>Who developed Blindpad?</h2>
+        <p>Blindpad was developed by <a href="http://rmnoon.github.io">Ryan Noon</a>. It leverages many other open source projects,
+            including Typescript, Angular2, and libraries by <a href="https://github.com/mikolalysenko">@mikolalysenko</a>            and <a href="https://github.com/nkohari">@nkohari</a>.  See comments in the code for full attribution.  Blindpad
+            is free software under the Apache License.</p>
+        <a class="footer" routerLink="/">Blindpad Home</a>
+    </contents>
+</about>
+<pad-body [class.disabled]="getView() != PadView.Editor" class="disabled">
+    <header>
+        <logo routerLink="/">blind<span class="primary">pad</span></logo>
+        <nav *ngIf="hasPad()">
+            <a class="invert" href="https://github.com/rmnoon/blindpad/issues/new">feedback</a>
+            <a class="invert" href="https://patreon.com">donate</a>
+            <a class="invert" routerLink="/about">about</a>
+            <button class="mode-button" *ngIf="!!getPadMode()" (click)="onModeButtonClick()">
+                {{ getPadMode().name }}
+            </button>
+            <mode-choices [@fadeInOut] *ngIf="visibleModeChoices != null">
+                <mode-choice *ngFor="let mode of visibleModeChoices" (click)="onModeChoice(mode)" [class.has-children]="mode.children.length > 0"
+                    [class.is-picked]="mode == getPadMode()">
+                    {{ mode.name }}
+                </mode-choice>
+            </mode-choices>
+        </nav>
+    </header>
+    <editor [pad]="getPad()"></editor>
+    <users>
+        <user *ngFor="let user of getUsers()" [model]="user"></user>
+    </users>
+</pad-body>

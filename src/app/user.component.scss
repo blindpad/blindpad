@@ -1,0 +1,161 @@
+@import "./mixins.scss";
+@import "./variables.scss";
+$user-width: 170px;
+$user-height: 40px;
+$user-icon-width: 40px;
+$mute-button-width: 29px;
+
+:host {
+  display: block;
+  height: $user-height;
+  width: $user-width;
+  position: relative;
+  border-top: 1px solid $color-divider;
+  border-right: 1px solid $color-divider;
+
+  audio {
+    display: none;
+  }
+
+  audio-monitor {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 0;
+
+    bar {
+      background-color: $color-disabled;
+    }
+
+    &.voice-active > bar {
+      background-color: $color-disabled;
+    }
+  }
+
+  .foreground {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+
+    & > * {
+      margin: 0px;
+    }
+
+    user-icon {
+      $icon-margin: 6px;
+      $icon-inner-width: $user-icon-width - 2 * $icon-margin;
+      width: $icon-inner-width;
+      height: $icon-inner-width;
+      line-height: $icon-inner-width;
+      margin: $icon-margin;
+      position: relative;
+
+      @include image-text();
+      @include border-radius($user-icon-width / 2);
+      text-align: center;
+      background-color: red;
+      font-size: 14px;
+
+      &.local-user {
+        font-size: 10px;
+      }
+
+      &.dark-text {
+        color: black;
+      }
+    }
+
+    username {
+      width: $user-width - ($user-icon-width + $mute-button-width);
+      text-overflow: ellipsis;
+      overflow: hidden;
+      font-size: 12px;
+    }
+
+    .mute-button {
+      width: $mute-button-width;
+      height: 24px;
+      padding: 0;
+      background-image: url(assets/volume_down.png);
+      background-repeat: no-repeat;
+
+      &:hover {
+        @include filter(invert(50%));
+      }
+
+      &:active {
+        @include filter(invert(20%));
+      }
+
+      &.voice-active:not(.muted) {
+        background-image: url(assets/volume_up.png);
+        background-position-x: 3.5px;
+      }
+
+      &.muted {
+        background-image: url(assets/volume_muted.png);
+        background-position-x: 3.5px;
+      }
+    }
+  }
+}
+
+// adapted from https://github.com/tobiasahlin/SpinKit
+
+.spinner {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.double-bounce1,
+.double-bounce2 {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: white;
+  opacity: 0.6;
+  position: absolute;
+  top: 0;
+  left: 0;
+  -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
+  animation: sk-bounce 2.0s infinite ease-in-out;
+}
+
+.double-bounce2 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+
+@-webkit-keyframes sk-bounce {
+  0%,
+  100% {
+    -webkit-transform: scale(0.0);
+  }
+
+  50% {
+    -webkit-transform: scale(1.0);
+  }
+}
+
+@keyframes sk-bounce {
+  0%,
+  100% {
+    transform: scale(0.0);
+    -webkit-transform: scale(0.0);
+  }
+
+  50% {
+    transform: scale(1.0);
+    -webkit-transform: scale(1.0);
+  }
+}

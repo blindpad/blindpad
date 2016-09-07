@@ -1,0 +1,22 @@
+$color-primary-dark:   #388E3C;
+$color-primary:        #4CAF50;
+$color-primary-light:  #C8E6C9;
+$color-primary-text:   #FFFFFF;
+$color-accent:         #03A9F4;
+$color-primary-text:   #FEFEFE;
+$color-secondary-text: #CACACA;
+
+$color-disabled:       transparentize(#BDBDBD, 0.8);
+$color-warning:        #FFEB3B;
+$color-error:          #D32F2F;
+
+$color-editor:         #272822;
+$color-background:     #121310;
+$color-divider:        #2E2F2A;
+$color-overlay:        fade-out($color-background, 0.5);
+
+$body-font:             Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;
+
+$content-max-width:     825px;
+$content-min-width:     500px;
+$header-height:         33px;

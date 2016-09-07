@@ -1,0 +1,196 @@
+@import "./mixins.scss";
+@import "./variables.scss";
+
+:host {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+logo {
+    display: block;
+    color: $color-primary-text;
+    @include image-text();
+    cursor: pointer;
+}
+
+header {
+    $header-inner-height: $header-height - 1px;
+    background-color: $color-background;
+    height: $header-inner-height;
+    border-bottom: 1px solid $color-divider;
+
+    display: flex;
+    align-items: center;
+
+    logo {
+        display: inline;
+        margin-left: 8px;
+        font-size: 14pt;
+    }
+
+    nav {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+
+        & > * {
+            margin-left: 16px;
+        }
+
+        .mode-button {
+            padding: 0px 12px;
+            height: $header-inner-height;
+            border-radius: 0;
+            font-size: 14px;
+
+            &:after {
+                margin-left: 4px;
+                content: "\25BE";
+            }
+        }
+
+        mode-choices {
+            position: absolute;
+            top: $header-inner-height;
+            right: 0;
+            background-color: $color-overlay;
+            max-height: calc(100% - #{$header-inner-height});
+            // padding: 8px 0px;
+            overflow-y: auto;
+            z-index: 1000;
+            min-width: 140px;
+
+            mode-choice {
+                display: block;
+                text-align: left;
+                font-size: 14px;
+                padding: 4px 12px 4px 16px;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: $color-primary;
+                }
+
+                &.has-children:after {
+                    content: "\25B8";
+                    float: right;
+                }
+
+                &.is-picked:before {
+                    content: "\2713";
+                    margin: 0 0 0 -12px;
+                    padding: 4px 0px 4px 0px;
+                }
+            }
+        }
+    }
+}
+
+welcome, audio-setup, about {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+
+    contents {
+        width: 400px;
+        display: block;
+        margin: auto;
+    }
+}
+
+welcome {
+    .reconfigure-prompt {
+        &, * {
+            font-style: italic;
+        }
+        margin-top: 24px;
+    }
+}
+
+audio-setup {
+    .start-button {
+        display: inline-block;
+        vertical-align: middle;
+    }
+    audio-monitor {
+        display: inline-block;
+        height: 12px;
+        width: 180px;
+        margin-left: 12px;
+        vertical-align: middle;
+        bar {
+            background-color: $color-disabled;
+        }
+        &.voice-active > bar {
+            background-color: $color-primary;
+        }
+    }
+    .opt-out-button {
+        font-style: italic;
+        margin-top: 24px;        
+    }
+    phrases {
+        display: block;
+    }
+}
+
+about {
+    overflow: auto;
+
+    logo {
+        font-size: 48px;
+        margin-top: 80px;
+    }
+
+    .footer {
+        display: block;
+        margin: 40px 0;
+    }
+}
+
+pad-body {
+    background-color: $color-editor;;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    transition: .3s all linear;
+
+    &.disabled {
+        @include filter(blur(2px) opacity(0.3));
+    }
+
+    editor {
+        display: block;
+        z-index: 0;
+        margin-top: $header-height;
+        height: calc(100% - #{$header-height});
+        width: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+    }
+
+    users {
+        position: absolute;
+        z-index: 1;
+        bottom: 0;
+        left: 0;
+        max-height: 50%;
+        overflow-y: auto;
+    }
+}
+
+

@@ -1,0 +1,21 @@
+@import "./variables.scss";
+
+.CodeMirror {
+    height: auto;
+    margin: 0 auto;
+    max-width: $content-max-width;
+    min-width: $content-min-width;
+    min-height: 0;
+    padding: 0;
+}
+
+.disabled {
+    editor {
+        .CodeMirror-linenumber {
+            opacity: 0.0;
+        }
+        .CodeMirror-activeline-background {
+            background: none;   
+        }
+    }
+}
