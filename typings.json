@@ -3,9 +3,16 @@
     "codemirror": "registry:dt/codemirror#0.0.0+20160619021621",
     "core-js": "registry:dt/core-js#0.0.0+20160602141332",
     "jasmine": "registry:dt/jasmine#2.2.0+20160621224255",
-    "node": "registry:dt/node#6.0.0+20160621231320"
+    "lz-string": "registry:dt/lz-string#0.0.0+20160317120654",
+    "node": "registry:dt/node#6.0.0+20160621231320",
+    "socket.io": "registry:dt/socket.io#1.4.4+20160907102948",
+    "socket.io-client": "registry:dt/socket.io-client#1.4.4+20160317120654",
+    "webaudioapi/waa": "registry:dt/webaudioapi/waa#0.0.0+20160328224055",
+    "webrtc/mediastream": "registry:dt/webrtc/mediastream#0.0.0+20160317120654",
+    "webrtc/rtcpeerconnection": "registry:dt/webrtc/rtcpeerconnection#0.0.0+20160719235950"
   },
   "dependencies": {
-    "lodash": "registry:npm/lodash#4.0.0+20160723033700"
+    "lodash": "registry:npm/lodash#4.0.0+20160723033700",
+    "node-uuid": "registry:npm/node-uuid#1.4.7+20160723033700"
   }
 }
