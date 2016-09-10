@@ -11,7 +11,7 @@
                 <span *ngIf="hasPad()">Join <em>{{getJoinId()}}</em></span>
                 <span *ngIf="!hasPad()">Start a new pad</span>
             </button>
-            <p class="reconfigure-prompt" *ngIf="media.isCalibrated()">You're all set. <button (click)="media.clearCalibration()" class="text invert inline">Click here</button> if you want to reset your audio settings.</p>
+            <p class="reconfigure-prompt" *ngIf="media.isCalibrated()"><button (click)="media.clearCalibration()" class="text invert inline">You're all set. Click here if you want to reset your audio settings.</button></p>
         </div>
     </contents>
 </welcome>
