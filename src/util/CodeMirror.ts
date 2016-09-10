@@ -39,7 +39,7 @@ export interface EditorMode {
     children?: EditorMode[];
 }
 
-const DEFAULT_MODE: EditorMode = { name: 'Plaintext', mime: 'text/plain', children: [] };
+export const DEFAULT_MODE: EditorMode = { name: 'Plaintext', mime: 'text/plain', children: [] };
 
 export const MODES: EditorMode[] = filterModes([
     DEFAULT_MODE,
