@@ -86,6 +86,10 @@ $mute-button-width: 29px;
       background-image: url(assets/volume_down.png);
       background-repeat: no-repeat;
 
+      &.local-user {
+        background-image: url(assets/mic_down.png);
+      }
+
       &:hover {
         @include filter(invert(50%));
       }
@@ -97,11 +101,21 @@ $mute-button-width: 29px;
       &.voice-active:not(.muted) {
         background-image: url(assets/volume_up.png);
         background-position-x: 3.5px;
+
+        &.local-user {
+          background-image: url(assets/mic_up.png);
+          background-position-x: 0px;
+        }
       }
 
       &.muted {
         background-image: url(assets/volume_muted.png);
         background-position-x: 3.5px;
+
+        &.local-user {
+          background-image: url(assets/mic_muted.png);
+          background-position-x: 0px;
+        }
       }
     }
   }

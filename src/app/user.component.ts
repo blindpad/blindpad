@@ -14,6 +14,9 @@ import { UserModel } from '../services/UserModel';
 require('../assets/volume_up.png');
 require('../assets/volume_down.png');
 require('../assets/volume_muted.png');
+require('../assets/mic_up.png');
+require('../assets/mic_down.png');
+require('../assets/mic_muted.png');
 
 @Component({
     selector: 'user',

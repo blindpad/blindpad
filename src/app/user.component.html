@@ -11,5 +11,5 @@
     <username [title]="connected ? name : 'Connecting...'">
         {{ connected ? name : 'Connecting...' }}
     </username>
-    <button *ngIf="connected" title="Mute" class="mute-button text" [class.muted]="model.getIsMuted().value" [class.voice-active]="voiceIsActive" (click)="model.setMuted()"></button>
+    <button *ngIf="connected" title="Mute" class="mute-button text" [class.muted]="model.getIsMuted().value" [class.voice-active]="voiceIsActive" [class.local-user]="model.isLocalUser()" (click)="model.setMuted()"></button>
 </div>
