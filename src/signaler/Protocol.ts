@@ -1,5 +1,6 @@
-const USE_LOCAL_SIGNALER: boolean = false;
-
+const USE_LOCAL_SIGNALER = false;
+const REMOTE_SIGNALER_URL = 'bpsignaler-rmnoon.rhcloud.com';
+const REMOTE_SIGNALER_PORT = 8443;
 /*
  * Phase 1: Peer Discovery
  * 
@@ -247,11 +248,11 @@ export function getSignalerURI(): string {
 }
 
 export function getSignalerHost(): string {
-    return process.env.NODE_IP || USE_LOCAL_SIGNALER ? '127.0.0.1' : 'bpsignaler-rmnoon.rhcloud.com';
+    return process.env.NODE_IP || USE_LOCAL_SIGNALER ? '127.0.0.1' : REMOTE_SIGNALER_URL;
 }
 
 export function getSignalerPort(): number {
-    return process.env.NODE_PORT || USE_LOCAL_SIGNALER ? 3000 : 8443;
+    return process.env.NODE_PORT || USE_LOCAL_SIGNALER ? 3000 : REMOTE_SIGNALER_PORT;
 }
 
 export function getSignalerProtocol(): string {
