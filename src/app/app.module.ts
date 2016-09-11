@@ -14,6 +14,7 @@ require('../assets/favicon/favicon-32x32.png');
 require('../assets/favicon/favicon-96x96.png');
 require('../assets/favicon/favicon-16x16.png');
 require('../assets/favicon/favicon.ico');
+require('../assets/bp_logo.png');
 
 require('../scss/global.scss');
 
