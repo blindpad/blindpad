@@ -178,7 +178,7 @@ export class UserModel {
 
         // when the dechunker emits a message send it to our local pipe
         this.dechunker.messages.subscribe(message => {
-            console.error('received msg: ', message.length, message.substring(0, 20));
+            // console.error('received msg: ', message.length, message.substring(0, 20));
             this.messagesIn.next(JSON.parse(message));
         });
 
@@ -188,7 +188,7 @@ export class UserModel {
             .subscribe(message => {
                 const str = JSON.stringify(message);
                 this.chunker.messages.next(str);
-                console.error('sent msg: ', str.length, str.substring(0, 20));
+                // console.error('sent msg: ', str.length, str.substring(0, 20));
             });
 
         // when we get a cxn request or response feed it to the next available peer socket (which should be hungry for it)  

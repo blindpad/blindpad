@@ -2,8 +2,9 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { AppModule }              from './app.module';
 import { enableProdMode } from '@angular/core';
 
-require('./README.prod.md');
-require('../../LICENSE');
+require('file?name=[name].[ext]!./404.html');
+require('file?name=[name]!../../LICENSE');
+require('file?name=README.md!./README.prod.md');
 
 function main() {
     enableProdMode();

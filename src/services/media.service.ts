@@ -8,7 +8,7 @@ import { PitchShifter } from '../util/PitchShifter';
 import { VoiceAnalyser } from '../util/VoiceAnalyser';
 
 const DEFAULT_REFERENCE_PITCH: number = 157.5;
-const DEBUG_CALIBRATION: number = 115;
+const DEBUG_CALIBRATION: number = null; // 115;
 const SAVED_CALIBRATION_KEY = 'measuredPitch';
 
 @Injectable()

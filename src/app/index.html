@@ -1,43 +1,78 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-  <base href="/">
-  <title>blindpad</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <base href="/">
+    <title>blindpad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96x96.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
-  <link href="https://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext" rel="stylesheet" type="text/css">
-  <link rel="stylesheet" type="text/css" href="/global.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+    <link href="https://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/global.css">
+
+    <!-- Start Single Page Apps for GitHub Pages -->
+    <script type="text/javascript">
+        /////////////////////////////////////////////////////////////////////////
+        // Single Page Apps for GitHub Pages
+        // https://github.com/rafrex/spa-github-pages
+        // Copyright (c) 2016 Rafael Pedicini, licensed under the MIT License
+        // ----------------------------------------------------------------------
+        // This script checks to see if a redirect is present in the query string
+        // and converts it back into the correct url and adds it to the
+        // browser's history using window.history.replaceState(...),
+        // which won't cause the browser to attempt to load the new url.
+        // When the single page app is loaded further down in this file,
+        // the correct url will be waiting in the browser's history for
+        // the single page app to route accordingly.
+        /////////////////////////////////////////////////////////////////////////
+        (function(l) {
+          if (l.search) {
+            var q = {};
+            l.search.slice(1).split('&').forEach(function(v) {
+              var a = v.split('=');
+              q[a[0]] = a.slice(1).join('=').replace(/~and~/g, '&');
+            });
+            if (q.p !== undefined) {
+              window.history.replaceState(null, null,
+                l.pathname.slice(0, -1) + (q.p || '') +
+                (q.q ? ('?' + q.q) : '') +
+                l.hash
+              );
+            }
+          }
+        }(window.location))
+      </script>
+    <!-- End Single Page Apps for GitHub Pages -->
 
 </head>
 
 <body>
-  <app>
-    <div class="loading sk-cube-grid">
-      <div class="sk-cube sk-cube1"></div>
-      <div class="sk-cube sk-cube2"></div>
-      <div class="sk-cube sk-cube3"></div>
-      <div class="sk-cube sk-cube4"></div>
-      <div class="sk-cube sk-cube5"></div>
-      <div class="sk-cube sk-cube6"></div>
-      <div class="sk-cube sk-cube7"></div>
-      <div class="sk-cube sk-cube8"></div>
-      <div class="sk-cube sk-cube9"></div>
-    </div>
-  </app>
-  <!-- web animations polyfill -->
-  <script src="web-animations.min.js"></script>
+    <app>
+        <div class="loading sk-cube-grid">
+            <div class="sk-cube sk-cube1"></div>
+            <div class="sk-cube sk-cube2"></div>
+            <div class="sk-cube sk-cube3"></div>
+            <div class="sk-cube sk-cube4"></div>
+            <div class="sk-cube sk-cube5"></div>
+            <div class="sk-cube sk-cube6"></div>
+            <div class="sk-cube sk-cube7"></div>
+            <div class="sk-cube sk-cube8"></div>
+            <div class="sk-cube sk-cube9"></div>
+        </div>
+    </app>
+    <!-- web animations polyfill -->
+    <script src="web-animations.min.js"></script>
 
-  <!-- angular2 shims + dependencies -->
-  <script src="shim.min.js"></script>
-  <script src="zone.js"></script>
-  <script src="Reflect.js"></script>
+    <!-- angular2 shims + dependencies -->
+    <script src="shim.min.js"></script>
+    <script src="zone.js"></script>
+    <script src="Reflect.js"></script>
 
-  <!-- the actual app bundle -->
-  <script src="bundle.js"></script>
+    <!-- the actual app bundle -->
+    <script src="bundle.js"></script>
 </body>
 
 </html>
