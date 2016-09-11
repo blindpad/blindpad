@@ -43,7 +43,9 @@ module.exports = [
                 { test: /\.css$/, loaders: ['style-loader', 'css-loader'] },
                 { test: /\.scss$/, loaders: ['file?name=[name].css', 'sass'], exclude: /\.component.scss$/ },
                 { test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)$/, loader: 'file?name=assets/[name].[ext]' },
-                { test: /\.(ico|ogg)$/, loader: 'file?name=[name].[ext]' },
+                { test: /LICENSE$/, loader: 'file?name=[name]' },
+                { test: /README.prod.md$/, loader: 'file?name=README.md' },
+                { test: /\.ico$/, loader: 'file?name=[name].[ext]' },
             ]
         },
         sassLoader: {

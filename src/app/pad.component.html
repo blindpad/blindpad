@@ -1,6 +1,6 @@
 <welcome [@fadeInOut] *ngIf="getView() == PadView.Welcome">
     <contents>
-        <h1>blindpad is an <a href="http://www.github.com/rmnoon/blindpad">open source</a> shared peer-to-peer text editor for
+        <h1>blindpad is an <a href="https://www.github.com/blindpad/blindpad">open source</a> shared peer-to-peer text editor for
             collaborating on code and technical documents.</h1>
         <button (click)="startAudioSetup()" *ngIf="media.needsCalibration()">Setup Audio</button>
         <div *ngIf="!media.needsCalibration()">
@@ -30,7 +30,7 @@
                     hitting <a href="https://bugs.chromium.org/p/webrtc/issues/detail?id=4799">this bug</a> (which requires restarting Chrome).
                 </p>
                 <p *ngIf="media.getCalibrationAttempts() > 1">
-                    If you're still having trouble please <a href="https://github.com/rmnoon/blindpad/issues/new">open an issue</a> on Github.
+                    If you're still having trouble please <a href="https://github.com/blindpad/blindpad/issues/new">open an issue</a> on Github.
                 </p>
             </div>
         </div>
@@ -50,7 +50,7 @@
     <contents>
         <logo routerLink="/">blind<span class="primary">pad</span></logo>
         <h2>What is Blindpad?</h2>
-        <p>Blindpad is an <a href="https://github.com/rmnoon/blindpad">open source</a> collaborative text editor (like Google
+        <p>Blindpad is an <a href="https://github.com/blindpad/blindpad">open source</a> collaborative text editor (like Google
             Docs or <a href="https://coderpad.io">CoderPad</a>) with integrated semi-anonymizing voice chat intended to help
             reduce bias in technical communication.  In particular it can be used to extend the concept of “<a href="https://en.wikipedia.org/wiki/Blind_audition">blind auditions</a>”
             to software programming and technical design interviews.  It is inspired by economists Claudia Goldin (Harvard)
@@ -77,7 +77,7 @@
         <p>Applicant Tracking Systems or recruiting coordinators need only decide on a URL to share with with all parties before
             an interview.</p>
         <h2>How can I use Blindpad?</h2>
-        <p>A public version of Blindpad is hosted at <a href="https://rmnoon.github.io/blindpad">rmnoon.github.io/blindpad</a>.
+        <p>A public version of Blindpad is hosted at <a href="https://blindpad.github.io">blindpad.github.io</a>.
              Blindpad can be hosted on your own servers quite easily: you only need to serve the static content and host
             a small (~100 line) NodeJS signaler (used for peer discovery).</p>
         <h2>What’s the long-term goal of the project?</h2>
@@ -94,13 +94,13 @@
             version of Blindpad and to fund future development.</p>
         <p>If you’re inclined to contribute creatively (with code or design help) feel free to check out the repository, read
             over the project’s roadmap, and/or submit a pull request.</p>
-        <p>Lastly: if you have any ideas or feature requests on how to make the app more successful feel free to <a href="https://github.com/rmnoon/blindpad/issues/new">open an issue</a>            on Github.</p>
+        <p>Lastly: if you have any ideas or feature requests on how to make the app more successful feel free to <a href="https://github.com/blindpad/blindpad/issues/new">open an issue</a>            on Github.</p>
         <h2>What should I do if I have a problem or run into a bug?</h2>
-        <p>For all problems please <a href="https://github.com/rmnoon/blindpad/issues/new">open an issue</a> on Github. If possible
+        <p>For all problems please <a href="https://github.com/blindpad/blindpad/issues/new">open an issue</a> on Github. If possible
             please try to include simple steps to reproduce the problem.</p>
         <h2>Who developed Blindpad?</h2>
         <p>Blindpad was developed by <a href="http://rmnoon.github.io">Ryan Noon</a>. It leverages many other open source projects,
-            including Typescript, Angular2, and libraries by <a href="https://github.com/mikolalysenko">@mikolalysenko</a>            and <a href="https://github.com/nkohari">@nkohari</a>.  See comments in the code for full attribution.  Blindpad
+            including Typescript, Angular2, and libraries by <a href="https://github.com/mikolalysenko">@mikolalysenko</a> and <a href="https://github.com/nkohari">@nkohari</a>.  See comments in the code for full attribution.  Blindpad
             is free software under the Apache License.</p>
         <a class="footer" routerLink="/">Blindpad Home</a>
     </contents>
@@ -109,7 +109,7 @@
     <header>
         <logo routerLink="/">blind<span class="primary">pad</span></logo>
         <nav *ngIf="hasPad()">
-            <a class="invert" href="https://github.com/rmnoon/blindpad/issues/new">feedback</a>
+            <a class="invert" href="https://github.com/blindpad/blindpad/issues/new">feedback</a>
             <a class="invert" href="https://patreon.com">donate</a>
             <a class="invert" routerLink="/about">about</a>
             <button class="mode-button" *ngIf="!!getPadMode()" (click)="onModeButtonClick()">

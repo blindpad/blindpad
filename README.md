@@ -1,7 +1,7 @@
 TODO: screenshot here
 
 ## What is Blindpad?
-Blindpad is an [open source](https://github.com/rmnoon/blindpad) collaborative text editor (like Google Docs or [CoderPad](https://coderpad.io)) with integrated semi-anonymizing voice chat intended to help reduce bias in technical communication.  In particular it can be used to extend the concept of “[blind auditions](https://en.wikipedia.org/wiki/Blind_audition)” to software programming and technical design interviews.  It is inspired by economists Claudia Goldin (Harvard) and Cecilia Rouse (Princeton) who concluded in [their 1997 paper](https://www.aeaweb.org/articles?id=10.1257/aer.90.4.715) that the introduction of blind auditions in professional orchestras is likely responsible for about one-third of the 250% increase in female membership between 1970 and the mid 1990s.
+Blindpad is an [open source](https://github.com/blindpad/blindpad) collaborative text editor (like Google Docs or [CoderPad](https://coderpad.io)) with integrated semi-anonymizing voice chat intended to help reduce bias in technical communication.  In particular it can be used to extend the concept of “[blind auditions](https://en.wikipedia.org/wiki/Blind_audition)” to software programming and technical design interviews.  It is inspired by economists Claudia Goldin (Harvard) and Cecilia Rouse (Princeton) who concluded in [their 1997 paper](https://www.aeaweb.org/articles?id=10.1257/aer.90.4.715) that the introduction of blind auditions in professional orchestras is likely responsible for about one-third of the 250% increase in female membership between 1970 and the mid 1990s.
 
 ## How does it work?
 ### Semi-anonymizing voice chat
@@ -21,7 +21,7 @@ Applicant Tracking Systems or recruiting coordinators need only decide on a URL 
 
 
 ## How can I use Blindpad?
-A public version of Blindpad is hosted at [rmnoon.github.io/blindpad](https://rmnoon.github.io/blindpad).  Blindpad can be hosted on your own servers quite easily: you only need to serve the static content and host a small (~100 line) NodeJS signaler (used for peer discovery).
+A public version of Blindpad is hosted at [blindpad.github.io](https://blindpad.github.io).  Blindpad can be hosted on your own servers quite easily: you only need to serve the static content and host a small (~100 line) NodeJS signaler (used for peer discovery).
 
 ## What’s the long-term goal of the project?
 The overarching goal of the project is to build a community capable of producing, hosting, and maintaining excellent free tooling that reduces bias in evaluation and communication.  This is a really hard problem and while a perfect solution might not be possible incremental progress is straightforward.
@@ -33,10 +33,10 @@ If you’d like to support the project financially you can TODO.  Donations will
 
 If you’re inclined to contribute creatively (with code or design help) feel free to check out the repository, read over the project’s roadmap, and/or submit a pull request.
 
-Lastly: if you have any ideas or feature requests on how to make the app more successful feel free to [open an issue](https://github.com/rmnoon/blindpad/issues/new) on Github.
+Lastly: if you have any ideas or feature requests on how to make the app more successful feel free to [open an issue](https://github.com/blindpad/blindpad/issues/new) on Github.
 
 ## What should I do if I have a problem or run into a bug?
-For all problems please [open an issue](https://github.com/rmnoon/blindpad/issues/new) on Github.  If possible please try to include simple steps to reproduce the problem.
+For all problems please [open an issue](https://github.com/blindpad/blindpad/issues/new) on Github.  If possible please try to include simple steps to reproduce the problem.
 
 ## Who developed Blindpad?
 Blindpad was developed by [Ryan Noon](http://rmnoon.github.io).  It leverages many other open source projects, including Typescript, Angular2, and libraries by [@mikolalysenko](https://github.com/mikolalysenko) and [@nkohari](https://github.com/nkohari).  See comments in the code for full attribution.  Blindpad is free software under the Apache License.
@@ -44,7 +44,7 @@ Blindpad was developed by [Ryan Noon](http://rmnoon.github.io).  It leverages ma
 ## Setting up the code
 ```bash
 # clone the repo
-git clone git@github.com:rmnoon/blindpad.git
+git clone git@github.com:blindpad/blindpad.git
 
 # install dependencies
 npm install
