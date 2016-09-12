@@ -10,7 +10,10 @@ import { PadEdit } from '../signaler/Protocol';
     selector: 'editor',
     template: '',
     styleUrls: ['editor.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    host: {
+        '(click)': 'onEditorClick($event)'
+    }
 })
 export class EditorComponent implements OnInit, OnDestroy, OnChanges {
 
@@ -70,6 +73,10 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
         this.mimeSub = pad.getMimeType().subscribe(mime => {
             this.editor.setOption('mode', getModeForMime(mime).mime);
         });
+    }
+
+    onEditorClick(event: MouseEvent) {
+        this.editor.focus();
     }
 
     private setDemoMode(demoMode: boolean) {
