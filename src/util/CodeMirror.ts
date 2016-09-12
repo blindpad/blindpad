@@ -160,7 +160,8 @@ export const DEFAULT_EDITOR_CONFIG = {
     lineWrapping: true,
     styleActiveLine: true,
     autofocus: true,
-    mode: DEFAULT_MODE.mime
+    mode: DEFAULT_MODE.mime,
+    viewportMargin: Infinity
 } as CodeMirror.EditorConfiguration;
 
 export function buildEditor(host: HTMLElement, options = DEFAULT_EDITOR_CONFIG) {

@@ -1,6 +1,5 @@
 @import "./mixins.scss";
 @import "./variables.scss";
-$user-width: 170px;
 $user-height: 40px;
 $user-icon-width: 40px;
 $mute-button-width: 29px;
@@ -8,10 +7,8 @@ $mute-button-width: 29px;
 :host {
   display: block;
   height: $user-height;
-  width: $user-width;
+  width: 100%;
   position: relative;
-  border-top: 1px solid $color-divider;
-  border-right: 1px solid $color-divider;
 
   audio {
     display: none;
@@ -73,7 +70,7 @@ $mute-button-width: 29px;
     }
 
     username {
-      width: $user-width - ($user-icon-width + $mute-button-width);
+      flex: 1 1;
       text-overflow: ellipsis;
       overflow: hidden;
       font-size: 12px;

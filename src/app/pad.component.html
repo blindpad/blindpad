@@ -105,8 +105,8 @@
         <a class="footer" routerLink="/">Blindpad Home</a>
     </contents>
 </about>
-<pad-body [class.disabled]="getView() != PadView.Editor" class="disabled">
-    <header>
+<pad-page [class.disabled]="getView() != PadView.Editor" class="disabled">
+    <pad-header>
         <logo routerLink="/">blind<span class="primary">pad</span></logo>
         <nav *ngIf="hasPad()">
             <a class="invert" href="https://github.com/blindpad/blindpad/issues/new">feedback</a>
@@ -122,9 +122,13 @@
                 </mode-choice>
             </mode-choices>
         </nav>
-    </header>
-    <editor [pad]="getPad()"></editor>
-    <users>
-        <user *ngFor="let user of getUsers()" [model]="user"></user>
-    </users>
-</pad-body>
+    </pad-header>
+    <pad-body>
+        <panel>
+            <users>
+                <user *ngFor="let user of getUsers()" [model]="user"></user>
+            </users>
+        </panel>
+        <editor [pad]="getPad()"></editor>
+    </pad-body>
+</pad-page>

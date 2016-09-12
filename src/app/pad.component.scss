@@ -15,77 +15,119 @@
     cursor: pointer;
   }
 
-  header {
-    $header-inner-height: $header-height - 1px;
-    background-color: $color-background;
-    height: $header-inner-height;
-    border-bottom: 1px solid $color-divider;
-    display: flex;
-    align-items: center;
+ pad-page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 
-    logo {
-      display: inline;
-      margin-left: 8px;
-      font-size: 14pt;
+    display: flex;
+    flex-flow: column nowrap;
+
+    background-color: $color-editor;
+    transition: .3s all linear;
+
+    &.disabled {
+      @include filter(blur(2px) opacity(0.3));
     }
 
-    nav {
-      margin-left: auto;
+    pad-header {
+      background-color: $color-background;
+      flex: 0 0 $header-height;
+      box-sizing: border-box;
+      border-bottom: 1px solid $color-divider;
       display: flex;
       align-items: center;
 
-      & > * {
-        margin-left: 16px;
+      logo {
+        display: inline;
+        margin-left: 8px;
+        font-size: 14pt;
       }
 
-      .mode-button {
-        padding: 0px 12px;
-        height: $header-inner-height;
-        border-radius: 0;
-        font-size: 14px;
+      nav {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
 
-        &:after {
-          margin-left: 4px;
-          content: "\25BE";
+        & > * {
+          margin-left: 16px;
         }
-      }
 
-      mode-choices {
-        position: absolute;
-        top: $header-inner-height;
-        right: 0;
-        background-color: $color-overlay;
-        max-height: calc(100% - #{$header-inner-height});
-        // padding: 8px 0px;
-        overflow-y: auto;
-        z-index: 1000;
-        min-width: 140px;
-
-        mode-choice {
-          display: block;
-          text-align: left;
+        .mode-button {
+          padding: 0px 12px;
+          height: $header-height - 1px;
+          border-radius: 0;
           font-size: 14px;
-          padding: 4px 12px 4px 16px;
-          cursor: pointer;
 
-          &:hover {
-            background-color: $color-primary;
+          &:after {
+            margin-left: 4px;
+            content: "\25BE";
           }
+        }
 
-          &.has-children:after {
-            content: "\25B8";
-            float: right;
-          }
+        mode-choices {
+          position: absolute;
+          top: $header-height;
+          right: 0;
+          background-color: $color-overlay;
+          max-height: calc(100% - #{$header-height});
+          // padding: 8px 0px;
+          overflow-y: auto;
+          z-index: 1000;
+          min-width: 140px;
 
-          &.is-picked:before {
-            content: "\2713";
-            margin: 0 0 0 -12px;
-            padding: 4px 0px 4px 0px;
+          mode-choice {
+            display: block;
+            text-align: left;
+            font-size: 14px;
+            padding: 4px 12px 4px 16px;
+            cursor: pointer;
+
+            &:hover {
+              background-color: $color-primary;
+            }
+
+            &.has-children:after {
+              content: "\25B8";
+              float: right;
+            }
+
+            &.is-picked:before {
+              content: "\2713";
+              margin: 0 0 0 -12px;
+              padding: 4px 0px 4px 0px;
+            }
           }
         }
       }
     }
+
+    pad-body {
+      flex-grow: 1;
+      display: flex;
+      flex-flow: row;
+
+      panel {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        overflow-y: auto;
+        max-width: 200px;
+        min-width: 60px;
+        flex: 1 1;
+      }
+
+      editor {
+        display: block;
+        flex: 3 3;
+        overflow-y: auto;
+      }
+    }
   }
+
+  /** overlays */
 
   welcome,
   audio-setup,
@@ -162,39 +204,4 @@
     }
   }
 
-  pad-body {
-    background-color: $color-editor;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    transition: .3s all linear;
-
-    &.disabled {
-      @include filter(blur(2px) opacity(0.3));
-    }
-
-    editor {
-      display: block;
-      z-index: 0;
-      margin-top: $header-height;
-      height: calc(100% - #{$header-height});
-      width: 100%;
-      overflow-x: hidden;
-      overflow-y: auto;
-      position: absolute;
-      top: 0px;
-      left: 0px;
-    }
-
-    users {
-      position: absolute;
-      z-index: 1;
-      bottom: 0;
-      left: 0;
-      max-height: 50%;
-      overflow-y: auto;
-    }
-  }
 }
