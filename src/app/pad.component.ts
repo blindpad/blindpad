@@ -26,7 +26,10 @@ enum PadView {
     selector: 'pad',
     templateUrl: 'pad.component.html',
     styleUrls: ['pad.component.scss'],
-    animations: [ fadeInOut ]
+    animations: [ fadeInOut ],
+    host: {
+        '(document:click)': 'onDocumentClick($event)'
+    }
 })
 export class PadComponent implements OnInit, OnDestroy {
 
@@ -126,6 +129,15 @@ export class PadComponent implements OnInit, OnDestroy {
             this.getPad().setMimeType(choice.mime);
             this.visibleModeChoices = null;
         }
+    }
+
+    onDocumentClick(event: MouseEvent) {
+        if (this.visibleModeChoices === null) return;
+        const target = event.target as Element;
+        const isModeChoice = target.tagName.toLowerCase() === 'mode-choice';
+        const isModeButton = target.classList.contains('mode-button');
+        if (isModeButton || isModeChoice) return;
+        this.visibleModeChoices = null;
     }
 
 }
