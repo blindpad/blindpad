@@ -43,7 +43,7 @@ export class BlindpadService {
     }
 
     private onBeforeUnload = () => {
-        this.setPadId(null);
+        if (this.pad.value) this.pad.value.close();
     }
 
 }
