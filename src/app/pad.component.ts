@@ -75,6 +75,11 @@ export class PadComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() { this.routeSub.unsubscribe(); }
+
+    hasWebRTC() { return !!window.RTCPeerConnection && !!window.navigator && !!window.navigator.getUserMedia; }
+    hasWebAudio() { return !!window.AudioContext || !!window['webkitAudioContext']; }
+    browserIsSupported() { return this.hasWebAudio() && this.hasWebRTC(); }
+
     getView(): PadView { return this.view; }
     getPad() { return this.blindpadService.getPad().value; }
     hasPad() { return !!this.getPad(); }

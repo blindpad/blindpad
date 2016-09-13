@@ -85,10 +85,20 @@ a, button.text, a:visited {
     }
 }
 
-.warning {
-    color: $color-warning;
+.warning, .error {
     font-style: italic;
     font-weight: 600;
+    a {
+        color: $color-primary-text;
+    }
+}
+
+.warning {
+    color: $color-warning;
+}
+
+.error {
+    color: $color-error;
 }
 
 .primary {

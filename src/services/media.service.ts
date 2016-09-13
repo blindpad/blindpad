@@ -35,7 +35,7 @@ export class MediaService {
     private calibrationQuality: number;
 
     constructor(private zone: NgZone) {
-        this.audioContext = new AudioContext();
+        this.audioContext = new (window['AudioContext'] || window['webkitAudioContext'])();
         this.initialized = false;
         this.optOut = false;
 
@@ -97,7 +97,6 @@ export class MediaService {
                             shifterNode.disconnect(this.destNode);
                         }
                         isConnected = isEnabled;
-                        console.error('pitch shifting turned on again: connected: ', isConnected);
                     });
             },
             error => {

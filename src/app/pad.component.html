@@ -2,8 +2,8 @@
     <contents>
         <h1>blindpad is an <a href="https://www.github.com/blindpad/blindpad">open source</a> shared peer-to-peer text editor for
             collaborating on code and technical documents.</h1>
-        <button (click)="startAudioSetup()" *ngIf="media.needsCalibration()">Setup Audio</button>
-        <div *ngIf="!media.needsCalibration()">
+        <button (click)="startAudioSetup()" *ngIf="media.needsCalibration() && browserIsSupported()">Setup Audio</button>
+        <div *ngIf="!media.needsCalibration() && browserIsSupported()">
             <p *ngIf="media.isOptOut()" class="warning">You've disabled your microphone. Others in your pad won't be able to hear you.</p>
             <button (click)="joinPad()">
                 <span *ngIf="hasPad()">Join <em>{{getJoinId()}}</em></span>
@@ -11,6 +11,12 @@
             </button>
             <p class="reconfigure-prompt" *ngIf="media.isCalibrated()"><button (click)="media.clearCalibration()" class="text invert inline">You're all set. Click here if you want to reset your audio settings.</button></p>
         </div>
+        <p *ngIf="!hasWebRTC()" class="error">
+            It looks like your browser doesn't currently support WebRTC.  <a href="https://webrtc.org/">Click here</a> for a list of compatible browsers.
+        </p>
+        <p *ngIf="!hasWebAudio()" class="error">
+            It looks like your browser doesn't currently support WebAudio.  <a href="http://caniuse.com/#feat=audio-api">Click here</a> for a list of compatible browsers.
+        </p>
     </contents>
 </welcome>
 <audio-setup [@fadeInOut] *ngIf="getView() == PadView.AudioSetup">
