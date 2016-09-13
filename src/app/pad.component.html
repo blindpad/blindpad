@@ -35,7 +35,7 @@
             </div>
         </div>
         <div [@fadeInOut] *ngIf="media.needsCalibration()">
-            <button class="start-button" (click)="media.setCalibrating(!media.isCalibrating())">
+            <button class="start-button" [disabled]="media.getLocalStream().value == null" (click)="media.setCalibrating(!media.isCalibrating())">
                 {{media.isCalibrating() ? "Stop" : "Begin"}}
             </button>
             <audio-monitor [analyser]="media.getLocalAnalyser()"></audio-monitor>

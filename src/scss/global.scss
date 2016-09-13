@@ -37,6 +37,11 @@ button {
     outline: none;
     cursor: pointer;
 
+    &:disabled, &:disabled:active, &:disabled:hover {
+        background-color: $color-disabled;
+        border-color: $color-disabled;
+    }
+
     &:hover {
         background-color: $color-primary-dark;
     }
