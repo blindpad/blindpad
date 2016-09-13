@@ -104,7 +104,7 @@ export class UserComponent implements OnChanges, OnDestroy {
             this.voiceIsActive = detected;
             if (this.model.isRemoteUser()) {
                 // mute remote users when they're not speaking to cut down on echo
-                (this.audioElem.nativeElement as HTMLAudioElement).volume = detected ? 1.0 : 0.0;
+                // (this.audioElem.nativeElement as HTMLAudioElement).volume = detected ? 1.0 : 0.0;
             }
         });
     }
