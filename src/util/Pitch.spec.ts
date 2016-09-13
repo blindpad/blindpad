@@ -21,7 +21,7 @@ describe('Pitch', () => {
         ctx.close();
     });
 
-    function expectPitch(filename: string, freq: number, done: DoneFn, tolerance = DEFAULT_TOLERANCE, procNode?: ScriptProcessorNode) {
+    function expectPitch(filename: string, freq: number, done: DoneFn, tolerance = DEFAULT_TOLERANCE, procNode?: AudioNode) {
         const audio = new Audio(filename);
         const stream = ctx.createMediaElementSource(audio);
 

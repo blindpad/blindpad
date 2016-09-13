@@ -19,7 +19,7 @@ const HOP_SIZE = 256;
 
 export class PitchShifter {
 
-    private node: ScriptProcessorNode;
+    private node: AudioNode;
     private targetPitch: number;
     private pitchScale: number;
 
@@ -55,15 +55,18 @@ export class PitchShifter {
         shifter(new Float32Array(FRAME_SIZE));
         shifter(new Float32Array(FRAME_SIZE));
 
-        const node = this.context.createScriptProcessor(FRAME_SIZE, 1, 1);
-        node.onaudioprocess = e => {
-            shifter(e.inputBuffer.getChannelData(0));
-            const out = e.outputBuffer.getChannelData(0);
-            const q = queue.shift();
-            out.set(q);
-            pool.freeFloat32(q);
-        };
-        this.node = node;
+        this.node = this.context.createGain();
+        (this.node as GainNode).gain.value = 1.0;
+
+        // const node = this.context.createScriptProcessor(FRAME_SIZE, 1, 1);
+        // node.onaudioprocess = e => {
+        //     shifter(e.inputBuffer.getChannelData(0));
+        //     const out = e.outputBuffer.getChannelData(0);
+        //     const q = queue.shift();
+        //     out.set(q);
+        //     pool.freeFloat32(q);
+        // };
+        // this.node = node;
     }
 
     /**
@@ -85,7 +88,7 @@ export class PitchShifter {
     /**
      * Returns the processor node for the pitch shift to insert into a WebAudio topology
      */
-    getNode(): ScriptProcessorNode {
+    getNode(): AudioNode {
         return this.node;
     }
 
