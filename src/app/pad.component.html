@@ -6,7 +6,6 @@
         <div *ngIf="!media.needsCalibration()">
             <p *ngIf="media.isOptOut()" class="warning">You've disabled your microphone. Others in your pad won't be able to hear you. Refresh this page if your change
                 your mind.</p>
-            <p *ngIf="media.isCalibrated() && media.getCalibrationAttempts() > 0">Audio Setup successful.</p>
             <button (click)="joinPad()">
                 <span *ngIf="hasPad()">Join <em>{{getJoinId()}}</em></span>
                 <span *ngIf="!hasPad()">Start a new pad</span>
@@ -23,8 +22,10 @@
                 <p>Please ensure your microphone is plugged in. We strongly recommended headphones.</p>
                 <p>Press the button below and read the text that appears. Press it again when you're finished.</p>
             </div>
-            <div *ngIf="media.getCalibrationAttempts() > 0" class="warning">
-                <p>Setup unsuccessful, please check your microphone and try again.</p>
+            <div *ngIf="media.getCalibrationAttempts() > 0">
+                <p class="warning">Setup unsuccessful, please check your microphone and try again.</p>
+                <p *ngIf="media.getCalibrationQuality() === 0.0">No voice data recorded.</p>
+                <p *ngIf="media.getCalibrationQuality() > 0.0 && media.getCalibrationQuality() < 1.0">The recording was low quality: make sure to read all of the phrases at an even pace.</p>
                 <p *ngIf="isChromeOnMac()">
                     It looks like you're using Chrome on OS X. If your microphone is connected but you're not getting any input you might be
                     hitting <a href="https://bugs.chromium.org/p/webrtc/issues/detail?id=4799">this bug</a> (which requires restarting Chrome).

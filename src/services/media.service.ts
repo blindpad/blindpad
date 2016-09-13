@@ -32,6 +32,7 @@ export class MediaService {
     private measuredPitch: BehaviorSubject<number>;
     private calibrationAttempts = 0;
     private storage: Storage = window.sessionStorage; // could also be localstorage
+    private calibrationQuality: number;
 
     constructor(private zone: NgZone) {
         this.audioContext = new AudioContext();
@@ -114,18 +115,27 @@ export class MediaService {
             if (calibrating) {
                 this.measuredPitch.next(null);
                 this.calibrationAttempts++;
+                this.calibrationQuality = null;
                 this.detector.start(this.microphoneNode);
             } else {
                 this.detector.stop();
-                this.measuredPitch.next(this.detector.getEstimate() || null);
+                this.calibrationQuality = this.detector.getEstimateQuality();
+                this.measuredPitch.next(this.detector.hasGoodEstimate() ? this.detector.getEstimate() : null);
             }
         });
     }
     isCalibrating() { return this.detector.isRunning(); }
-    isCalibrated() { return this.measuredPitch.value !== null; }
+    isCalibrated() { return this.getCalibration().value !== null; }
     needsCalibration() { return !this.isCalibrated() && !this.isOptOut(); }
     getCalibrationAttempts(): number { return this.calibrationAttempts; }
-    clearCalibration() { if (this.isCalibrated()) this.measuredPitch.next(null); }
+    getCalibration() { return this.measuredPitch; }
+    getCalibrationQuality() { return this.calibrationQuality; }
+
+    clearCalibration() {
+        if (!this.isCalibrated()) return;
+        this.calibrationAttempts = 0;
+        this.measuredPitch.next(null);
+    }
 
     setOptOut() {
         this.optOut = true;

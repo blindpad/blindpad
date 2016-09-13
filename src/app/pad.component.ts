@@ -75,36 +75,11 @@ export class PadComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() { this.routeSub.unsubscribe(); }
-    isChromeOnMac(): boolean { return !!bowser.chrome && !!bowser['mac']; }
-    optOutOfVoice() {
-        this.media.setOptOut();
-        this.view = PadView.Welcome;
-    }
-
     getView(): PadView { return this.view; }
-    startAudioSetup(): void {
-        this.media.initializeLocal();
-        this.view = PadView.AudioSetup;
-    }
-
-    getUsers(): UserModel[] {
-        if (!this.hasPad()) return [];
-        return Array.from(this.getPad().getUsers().values());
-    }
-
     getPad() { return this.blindpadService.getPad().value; }
-    getJoinId() { return this.hasPad() ? this.getPad().getPadId() : this.randomPadId; }
     hasPad() { return !!this.getPad(); }
-    joinPad() {
-        if (this.hasPad()) {
-            this.blindpadService.startPad();
-            this.view = PadView.Editor;
-        } else {
-            this.blindpadService.setPadId(this.randomPadId);
-            this.blindpadService.startPad();
-            this.router.navigate(['/pad', this.randomPadId]);
-        }
-    }
+
+    /* navigation */
 
     getPadMode(): EditorMode {
         const pad = this.getPad();
@@ -138,6 +113,46 @@ export class PadComponent implements OnInit, OnDestroy {
         const isModeButton = target.classList.contains('mode-button');
         if (isModeButton || isModeChoice) return;
         this.visibleModeChoices = null;
+    }
+
+    /* audio setup */
+
+    isChromeOnMac(): boolean { return !!bowser.chrome && !!bowser['mac']; }
+
+    optOutOfVoice() {
+        this.media.setOptOut();
+        this.view = PadView.Welcome;
+    }
+
+    startAudioSetup(): void {
+        this.media.initializeLocal();
+        this.view = PadView.AudioSetup;
+
+        // switch the view back when we've calibrated
+        this.media.getCalibration().filter(pitch => pitch > 0).take(1).subscribe(pitch => {
+            if (this.view === PadView.AudioSetup) {
+                this.view = PadView.Welcome;
+            }
+        });
+    }
+
+    getUsers(): UserModel[] {
+        if (!this.hasPad()) return [];
+        return Array.from(this.getPad().getUsers().values());
+    }
+
+    /* joining a pad */
+
+    getJoinId() { return this.hasPad() ? this.getPad().getPadId() : this.randomPadId; }
+    joinPad() {
+        if (this.hasPad()) {
+            this.blindpadService.startPad();
+            this.view = PadView.Editor;
+        } else {
+            this.blindpadService.setPadId(this.randomPadId);
+            this.blindpadService.startPad();
+            this.router.navigate(['/pad', this.randomPadId]);
+        }
     }
 
 }
