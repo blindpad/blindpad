@@ -97,7 +97,7 @@ export class MediaService {
                             shifterNode.disconnect(this.destNode);
                         }
                         isConnected = isEnabled;
-                        console.error('new code: connected: ', isConnected);
+                        console.error('pitch shifting turned on again: connected: ', isConnected);
                     });
             },
             error => {

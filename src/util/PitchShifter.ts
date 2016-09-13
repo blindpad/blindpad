@@ -55,18 +55,18 @@ export class PitchShifter {
         shifter(new Float32Array(FRAME_SIZE));
         shifter(new Float32Array(FRAME_SIZE));
 
-        this.node = this.context.createGain();
-        (this.node as GainNode).gain.value = 1.0;
+        // this.node = this.context.createGain();
+        // (this.node as GainNode).gain.value = 1.0;
 
-        // const node = this.context.createScriptProcessor(FRAME_SIZE, 1, 1);
-        // node.onaudioprocess = e => {
-        //     shifter(e.inputBuffer.getChannelData(0));
-        //     const out = e.outputBuffer.getChannelData(0);
-        //     const q = queue.shift();
-        //     out.set(q);
-        //     pool.freeFloat32(q);
-        // };
-        // this.node = node;
+        const node = this.context.createScriptProcessor(FRAME_SIZE, 1, 1);
+        node.onaudioprocess = e => {
+            shifter(e.inputBuffer.getChannelData(0));
+            const out = e.outputBuffer.getChannelData(0);
+            const q = queue.shift();
+            out.set(q);
+            pool.freeFloat32(q);
+        };
+        this.node = node;
     }
 
     /**
