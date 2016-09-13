@@ -100,6 +100,7 @@ export class MediaService {
                     });
             },
             error => {
+                this.localStream.next(null);
                 this.localStream.error(error);
                 this.optOut = true;
             });

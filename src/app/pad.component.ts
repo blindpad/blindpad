@@ -125,15 +125,23 @@ export class PadComponent implements OnInit, OnDestroy {
     }
 
     startAudioSetup(): void {
-        this.media.initializeLocal();
-        this.view = PadView.AudioSetup;
+        let initFailure = this.media.getLocalStream().subscribe(null, error => {
+            this.view = PadView.Welcome;
+            initFailure.unsubscribe();
+            initFailure = null;
+            if (success) success.unsubscribe();
+        });
 
-        // switch the view back when we've calibrated
-        this.media.getCalibration().filter(pitch => pitch > 0).take(1).subscribe(pitch => {
+        // switch the view back once we've calibrated
+        let success = this.media.getCalibration().filter(pitch => pitch !== null).take(1).subscribe(pitch => {
             if (this.view === PadView.AudioSetup) {
                 this.view = PadView.Welcome;
+                if (initFailure) { initFailure.unsubscribe(); }
             }
         });
+
+        this.media.initializeLocal();
+        this.view = PadView.AudioSetup;
     }
 
     getUsers(): UserModel[] {

@@ -4,8 +4,7 @@
             collaborating on code and technical documents.</h1>
         <button (click)="startAudioSetup()" *ngIf="media.needsCalibration()">Setup Audio</button>
         <div *ngIf="!media.needsCalibration()">
-            <p *ngIf="media.isOptOut()" class="warning">You've disabled your microphone. Others in your pad won't be able to hear you. Refresh this page if your change
-                your mind.</p>
+            <p *ngIf="media.isOptOut()" class="warning">You've disabled your microphone. Others in your pad won't be able to hear you.</p>
             <button (click)="joinPad()">
                 <span *ngIf="hasPad()">Join <em>{{getJoinId()}}</em></span>
                 <span *ngIf="!hasPad()">Start a new pad</span>
