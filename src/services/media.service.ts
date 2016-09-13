@@ -84,7 +84,7 @@ export class MediaService {
 
                 // we should mute the local user when either we're explicitly asked to mute or nobody's speaking (to save CPU)
                 let isConnected = false; // need this because disconnecting an unconnected node throws an error and we cant introspect in the API
-                this.isMuted.combineLatest(this.voiceAnalyser.getVoiceDetected(), (muted, detected) => !muted && detected)
+                this.isMuted.combineLatest(this.voiceAnalyser.getVoiceDetected(), (muted, detected) => !muted)// && detected) (disconnecting when voice not detected is too laggy: maybe use a gain node if it ends up noisy in practice?)
                     .subscribe(isEnabled => {
                         if (isEnabled === isConnected) return;
                         const shifterNode = this.shifter.getNode();
