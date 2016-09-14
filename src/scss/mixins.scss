@@ -29,3 +29,7 @@
     @include user-select(none);
 	cursor: default;
 }
+
+@mixin background-gradient($color: black) {
+    background: linear-gradient(to bottom, fade-out($color, 1.0) 0%, fade-out($color, 0.05) 100%);
+}

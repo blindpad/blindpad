@@ -46,7 +46,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(to bottom, fade-out(black, 1.0) 0%, fade-out(black, 0.05) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        @include background-gradient($color-background);
       }
     }
 
