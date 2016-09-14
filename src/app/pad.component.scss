@@ -15,6 +15,11 @@
     cursor: pointer;
   }
 
+  .opt-out-button {
+    font-style: italic;
+    margin-top: 24px;
+  }
+
  pad-page {
     position: absolute;
     top: 0;
@@ -180,11 +185,6 @@
       &.voice-active > bar {
         background-color: $color-primary;
       }
-    }
-
-    .opt-out-button {
-      font-style: italic;
-      margin-top: 24px;
     }
 
     phrases {

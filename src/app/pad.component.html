@@ -2,7 +2,10 @@
     <contents>
         <h1>blindpad is an <a href="https://www.github.com/blindpad/blindpad">open source</a> shared peer-to-peer text editor for
             collaborating on code and technical documents.</h1>
-        <button (click)="startAudioSetup()" *ngIf="media.needsCalibration() && browserIsSupported()">Setup Audio</button>
+        <div  *ngIf="media.needsCalibration() && browserIsSupported()">
+            <button (click)="startAudioSetup()">Setup Voice</button>
+            <button class="opt-out-button text invert" (click)="optOutOfVoice()">I don't want to use voice chat.</button>
+        </div>
         <div *ngIf="!media.needsCalibration() && browserIsSupported()">
             <p *ngIf="media.isOptOut()" class="warning">You've disabled your microphone. Others in your pad won't be able to hear you.</p>
             <button (click)="joinPad()">
