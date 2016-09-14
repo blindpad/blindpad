@@ -8,6 +8,8 @@ import { EXAMPLES } from '../util/ExampleCode';
 import { PadModel } from '../services/PadModel';
 import { PadEdit } from '../signaler/Protocol';
 
+// lots of handy stuff: https://github.com/Operational-Transformation/ot.js/blob/master/lib/codemirror-adapter.js
+
 @Component({
     selector: 'editor',
     template: '',
@@ -147,6 +149,18 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
             }
         });
     };
+
+    private onLocalCursorChanged() {
+        // we need this to get called when the local cursor changes
+    }
+
+    private getCursorPositions() {
+        // give back what we believe to be the current positions of all cursors in the doc
+    }
+
+    private setCursorPositions() {
+        // set cursors
+    }
 
     private onCursorActivity = (instance: CodeMirror.Editor) => {
         // console.log('cursor activity: ', instance);
