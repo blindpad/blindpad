@@ -9,7 +9,7 @@ For more information:
 - NPR. ["Blind Auditions Could Give Employers A Better Hiring Sense"](http://www.npr.org/sections/alltechconsidered/2015/05/28/410264592/blind-auditions-could-give-employers-a-better-hiring-sense), May 28 2015
 - The Today Show. ["Companies using 'blind auditions' to hire top talent"](http://www.today.com/video/companies-using-blind-auditions-to-hire-top-talent-459650627844), Jun 8 2015
 - Fast Company. ["Can Blind Interviews Finally Solve Tech's Diversity Hiring Problem?"](http://www.fastcompany.com/3042618/strong-female-lead/can-blind-interviews-finally-solve-techs-diversity-hiring-problem), Feb 23 2015
-- Business Insider ["Why companies are using 'blind auditions' to hire top talent"](http://www.businessinsider.com/companies-are-using-blind-auditions-to-hire-top-talent-2015-5), May 31 2015
+- Business Insider. ["Why companies are using 'blind auditions' to hire top talent"](http://www.businessinsider.com/companies-are-using-blind-auditions-to-hire-top-talent-2015-5), May 31 2015
 
 ## How does it work?
 ### Semi-anonymizing voice chat
