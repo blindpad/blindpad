@@ -32,7 +32,22 @@
     transition: .3s all linear;
 
     &.disabled {
-      @include filter(blur(2px) opacity(0.3));
+      @include filter(blur(1.7px) opacity(0.6));
+
+      & > pad-header {
+        opacity: 0;
+      }
+
+      &:after {
+        content: "";
+        position: absolute;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, fade-out(black, 1.0) 0%, fade-out(black, 0.05) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+      }
     }
 
     pad-header {
@@ -200,7 +215,7 @@
 
     logo {
       font-size: 48px;
-      margin-top: 80px;
+      margin-top: 48px;
     }
 
     .footer {

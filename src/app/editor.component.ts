@@ -2,7 +2,9 @@ import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, OnChanges,
 import { Subscription } from 'rxjs/Subscription';
 import { Observer } from 'rxjs/Observer';
 
-import { buildEditor, getModeForMime, DEFAULT_TEXT } from '../util/CodeMirror';
+import { buildEditor, getModeForMime, EditorMode } from '../util/CodeMirror';
+import { AutoEditor } from '../util/AutoEditor';
+import { EXAMPLES } from '../util/ExampleCode';
 import { PadModel } from '../services/PadModel';
 import { PadEdit } from '../signaler/Protocol';
 
@@ -21,7 +23,11 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
 
     private editor: CodeMirror.Editor;
     private applyingRemoteChanges = false;
+
     private isDemoMode = false;
+    private autoEditor: AutoEditor;
+    private autoEditsSub: Subscription;
+    private autoModeSub: Subscription;
 
     private remoteEditSub: Subscription;
     private localEdits: Observer<PadEdit[]>;
@@ -32,6 +38,11 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
 
     ngOnInit() {
         this.editor = buildEditor(this.elementRef.nativeElement);
+
+        this.autoEditor = new AutoEditor();
+        this.autoEditsSub = this.autoEditor.getEdits().subscribe(edit => this.onRemoteEdits([edit]));
+        this.autoModeSub = this.autoEditor.getMode().subscribe(this.setMode);
+
         this.editor.on('changes', this.onEditorChanges);
         this.editor.on('cursorActivity', this.onCursorActivity);
         this.editor.on('focus', this.onEditorFocus);
@@ -41,6 +52,10 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     ngOnDestroy() {
+        this.autoEditor.stop();
+        this.autoEditsSub.unsubscribe();
+        this.autoModeSub.unsubscribe();
+
         this.editor.off('changes', this.onEditorChanges);
         this.editor.off('cursorActivity', this.onCursorActivity);
         this.editor.off('focus', this.onEditorFocus);
@@ -60,19 +75,13 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
             this.mimeSub = null;
         }
         const pad = this.pad;
-        if (!pad || !this.editor) {
-            if (this.editor) this.setDemoMode(true);
-            return;
-        }
-        if (!pad.isStarted()) this.setDemoMode(true);
+        if (!this.editor) return;
+        if (!pad || !pad.isStarted()) this.setDemoMode(true);
+        if (!pad) return;
 
         this.remoteEditSub = pad.getRemoteEdits().subscribe(this.onRemoteEdits);
         this.localEdits = pad.getLocalEdits();
-        // this.editor.setValue(pad.getContents());
-
-        this.mimeSub = pad.getMimeType().subscribe(mime => {
-            this.editor.setOption('mode', getModeForMime(mime).mime);
-        });
+        this.mimeSub = pad.getMimeType().subscribe(mime => this.setMode(getModeForMime(mime)));
     }
 
     onEditorClick(event: MouseEvent) {
@@ -83,15 +92,20 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
         if (demoMode === this.isDemoMode) return;
         if (demoMode) {
             this.isDemoMode = true;
-            this.editor.setValue(DEFAULT_TEXT);
+            this.autoEditor.start(EXAMPLES);
         } else {
+            this.autoEditor.stop();
             this.editor.setValue('');
             this.isDemoMode = false;
         }
     }
 
+    private setMode = (mode: EditorMode) => {
+        this.editor.setOption('mode', mode.mime);
+    }
+
     private onRemoteEdits = (edits: PadEdit[]) => {
-        this.setDemoMode(false);
+        if (this.isDemoMode && this.pad && this.pad.isStarted()) this.setDemoMode(false);
         this.applyingRemoteChanges = true;
         const doc = this.editor.getDoc();
         this.editor.operation(() => {

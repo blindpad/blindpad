@@ -39,12 +39,16 @@ export interface EditorMode {
     children?: EditorMode[];
 }
 
-const DEFAULT_MODE: EditorMode = { name: 'Plaintext', mime: 'text/plain', children: [] };
+export const DEFAULT_MODE: EditorMode = { name: 'Plaintext', mime: 'text/plain', children: [] };
+export const JAVASCRIPT: EditorMode = { name: 'JavaScript', mime: 'application/javascript', children: [] };
+export const C: EditorMode = { name: 'C', mime: 'text/x-c', children: [] };
+export const PYTHON: EditorMode = { name: 'Python', mime: 'text/x-python', children: [] };
+export const RUST: EditorMode = { name: 'Rust', mime: 'text/x-rustsrc', children: [] };
 
 export const MODES: EditorMode[] = filterModes([
     DEFAULT_MODE,
     { name: 'Markdown', mime: 'text/x-markdown', children: [] },
-    { name: 'C', mime: 'text/x-c', children: [] },
+    C,
     { name: 'C++', mime: 'text/x-c++src', children: [] },
     { name: 'Java', mime: 'text/x-java', children: [] },
     { name: 'C#', mime: 'text/x-csharp', children: [] },
@@ -67,7 +71,7 @@ export const MODES: EditorMode[] = filterModes([
             { name: 'LESS', mime: 'text/x-less', children: [] }
         ]
     },
-    { name: 'JavaScript', mime: 'application/javascript', children: [] },
+    JAVASCRIPT,
     { name: 'TypeScript', mime: 'application/typescript', children: [] },
     { name: 'CoffeeScript', mime: 'text/coffeescript', children: [] },
     { name: 'JSX', mime: 'text/jsx', children: [] },
@@ -96,9 +100,9 @@ export const MODES: EditorMode[] = filterModes([
     { name: 'HTML', mime: 'text/html', children: [] },
     { name: 'Perl', mime: 'text/x-perl', children: [] },
     { name: 'PHP', mime: 'text/x-php', children: [] },
-    { name: 'Python', mime: 'text/x-python', children: [] },
+    PYTHON,
     { name: 'Ruby', mime: 'text/x-ruby', children: [] },
-    { name: 'Rust', mime: 'text/x-rustsrc', children: [] },
+    RUST,
     { name: 'Bash', mime: 'text/x-sh', children: [] },
     { name: 'Swift', mime: 'text/x-swift', children: [] },
     { name: 'Visual Basic', mime: 'text/x-vb', children: [] }
@@ -107,52 +111,6 @@ export const MODES: EditorMode[] = filterModes([
 const MIME_TO_MODE = indexModes(MODES);
 
 const UNKNOWN_MODE: EditorMode = { name: 'Unknown', mime: DEFAULT_MODE.mime, children: [] };
-
-export const DEFAULT_TEXT = `
-                                         ,ad8PP"""""""""YY8ba,
-                                      ad8P"'               \`"Y8b,
-                                   ,d8P"                      \`Y8b,
-                  ______________ ,d8P'                          \`Y8b,
-              ,ad8PPP"""""""""YYY888ba,                           "8b,
-           ,adP""'                 \`""Y8ba                         \`8b,
-        ,d8P"                           \`"Yb,                       \`8b
-      ,dP"                                 \`Y8a   ____               \`8,
-    ,dP"                                     \`Y8bdP""Yb,              8I
-   ,8P'                                        "Y8,  \`8b              Ib
-  ,8P'                                           "8b  I8              8I
- ,dP'                   ______                    \`8b d8              I8
- d8'                ,ad8P"""""Yba,                 \`8b8I              8I
-,8I               ,dP"IP'       "Yb,                 d8'              I8
-I8'              dP" ,8'          \`Yb,              d8'               dI
-I8              dP'  dP             d8b,          ,8P'                8'
-I8             ,8I  ,8'            ,8"\`Yb        d8"                 dP
-I8             I8'  dP             I8  \`Yb     ,8P'                 j8'
-I8             I8   8I             8P   \`Yb, ,d8"                  jP'
-I8             I8   8I             8I    \`Y8a8"                   j8'
-I8,            Y8,  8I             8I    ,d8"                    jP'
-\`8I            \`Yb, 8I             8I  ,d8"                     j8'
- Y8,             "8b8I             I8ad8"                     ,dP'
- \`8b               "8I             88P'                     ,d88'
-  \`Yb,              Y8             Yb                     ,dP" Yb
-   \`Yb,             I8,            \`8,                  ,dP'   \`8,
-    \`Y8,            \`8I             Yb,               ,dP'      Ib
-     \`Y8,            Yb,            \`Yb,            ,dP'        8I
-       "8b,          \`8I             \`Yb,         ,dP'          I8
-        \`Y8b,         Yb,             \`Yb,     ,d88'            8I
-          \`Y8ba,      \`8a              \`Y8a,,dP"'I8             I8
-            \`"Y8ba,    I8,               "Y8P'   dI             f8
-                ""Y8baa,8b,               \`Y8a,,d8'             dP
-                    \`""Y88b,                \`"YYP'              8'
-                         "Y8,                                  dP
-           Normand        \`Y8,                                j8'
-           Veilleux        \`Y8,                              j8'
-                            \`Y8b,                           j8'
-                              \`Y8b,                       ,d8'
-                                \`"Yba,                  ,dP"
-                                   \`"Yba,            ,adP"
-                                      \`"Y8bbaaaaaadd8P"
-                                           \`"""""""'
-`;
 
 export const DEFAULT_EDITOR_CONFIG = {
     theme: 'monokai',
