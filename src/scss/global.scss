@@ -2,111 +2,131 @@
 @import './loading.scss';
 
 html {
-    color: $color-primary-text;
-    font-family: $body-font;
-    font-size: 14px;
-    overflow: hidden;
+  color: $color-primary-text;
+  font-family: $body-font;
+  font-size: 14px;
+  overflow: hidden;
 }
 
 body {
-    padding: 0;
-    margin: 0;
-    background-color: $color-background;
+  padding: 0;
+  margin: 0;
+  background-color: $color-background;
 
-    .loading {
-        position: absolute;
-        top: calc(50% - 20px);
-        left: calc(50% - 20px);
-        margin: 0;
-    }
+  .loading {
+    position: absolute;
+    top: calc(50% - 20px);
+    left: calc(50% - 20px);
+    margin: 0;
+  }
+}
+
+p,
+h1,
+h2,
+h3,
+h4 {
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1;
+  font-kerning: normal;
+  -webkit-font-feature-settings: "kern";
+  -moz-font-feature-settings: "kern";
+  -moz-font-feature-settings: "kern=1";
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5)
 }
 
 button {
-    margin: 12px 0px;;
-    display: block;
+  margin: 12px 0px;
+  display: block;
+  font-family: $body-font;
+  font-size: 16px;
+  padding: 6px 12px;
+  background-color: $color-primary;
+  color: $color-primary-text;
+  border-radius: 4px;
+  border: solid 1px $color-primary-dark;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+  outline: none;
+  cursor: pointer;
 
-    font-family: $body-font;
-    font-size: 16px;
+  &:disabled,
+  &:disabled:active,
+  &:disabled:hover {
+    background-color: $color-disabled;
+    border-color: $color-disabled;
+  }
 
-    padding: 6px 12px;
-    background-color: $color-primary;
-    color: $color-primary-text;
-    border-radius: 4px;
-    border: solid 1px $color-primary-dark;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
-    outline: none;
-    cursor: pointer;
+  &:hover {
+    background-color: $color-primary-dark;
+  }
 
-    &:disabled, &:disabled:active, &:disabled:hover {
-        background-color: $color-disabled;
-        border-color: $color-disabled;
-    }
+  &:active {
+    background-color: darken($color-primary-dark, 10%);
+  }
 
-    &:hover {
-        background-color: $color-primary-dark;
-    }
+  &.text {
+    border-radius: 0px;
+    border: 0px;
+    font-size: 14px;
+    margin: 0;
+    padding: 0;
+  }
 
-    &:active {
-        background-color: darken($color-primary-dark, 10%);
-    }
-
-    &.text {
-        border-radius: 0px;
-        border: 0px;
-        font-size: 14px;
-        margin: 0;
-        padding: 0;
-    }
-
-    &.inline {
-        display: inline;
-    }
+  &.inline {
+    display: inline;
+  }
 }
 
-a, button.text, a:visited {
-    color: $color-primary;
+a,
+button.text,
+a:visited {
+  color: $color-primary;
+  background-color: transparent;
+  text-decoration: none;
+  transition: color .1s ease-in;
+
+  &:hover {
     background-color: transparent;
-    text-decoration: none;
-    transition: color .1s ease-in;
+    color: $color-primary-dark;
+  }
+
+  &.invert {
+    color: $color-primary-text;
+
+    &:visited {
+      color: $color-primary-text;
+    }
 
     &:hover {
-        background-color: transparent;
-        color: $color-primary-dark;
+      color: $color-primary-dark;
     }
-
-    &.invert {
-        color: $color-primary-text;
-        &:visited {
-            color: $color-primary-text;
-        }
-        &:hover {
-            color: $color-primary-dark;
-        }
-    }
+  }
 }
 
-.warning, .error {
-    font-style: italic;
-    font-weight: 600;
-    a {
-        color: $color-primary-text;
-    }
+.warning,
+.error {
+  font-style: italic;
+  font-weight: 600;
+
+  a {
+    color: $color-primary-text;
+  }
 }
 
 .warning {
-    color: $color-warning;
+  color: $color-warning;
 }
 
 .error {
-    color: $color-error;
+  color: $color-error;
 }
 
 .primary {
-    color: $color-primary;
+  color: $color-primary;
 }
 
 span.cm-def {
-    color: white !important; //$color-primary-light !important;
+  color: white !important; //$color-primary-light !important;
 }
 
 // span.cm-keyword {

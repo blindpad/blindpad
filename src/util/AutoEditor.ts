@@ -15,12 +15,18 @@ export class AutoEditor {
     private baseTime: number = null;
     private wiggleTime: number = null;
 
-    start(docs: {text: string, mode: EditorMode}[], baseTime = 200, wiggleTime = 100): void {
+    private curDocIdx: number = null;
+    private curPosition: number = null;
+
+    start(docs: {text: string, mode: EditorMode}[], baseTime = 100, wiggleTime = 100): void {
         if (this.isRunning()) return;
         this.docs = docs;
         this.baseTime = baseTime;
         this.wiggleTime = wiggleTime;
         this.requestId = window.setTimeout(this.onTick, this.getNextTimeout());
+
+        this.curDocIdx = Math.floor(Math.random() * this.docs.length);
+        this.curPosition = 0;
     }
 
     stop(): void {
@@ -37,7 +43,35 @@ export class AutoEditor {
     private onTick = () => {
         if (!this.isRunning()) return;
 
-        this.requestId = window.setTimeout(this.onTick, this.getNextTimeout());
+        const doc = this.docs[this.curDocIdx];
+        if (this.curPosition === 0) this.mode.next(doc.mode);
+
+        let chunk = doc.text.substring(this.curPosition, this.curPosition + 1);
+        for (let i = this.curPosition + chunk.length, next = doc.text.substring(i, i + 1);
+                next !== '' && ' \t\n\r\v'.indexOf(next) > -1;
+                i++, next = doc.text.substring(i, i + 1)) {
+            chunk += next;
+        }
+
+        if (chunk.length > 0) { // emit as insert
+            const edit = new PadEdit();
+            edit.isInsert = true;
+            edit.index = this.curPosition;
+            edit.text = chunk;
+            this.curPosition += chunk.length;
+            this.edits.next(edit);
+        } else { // we've reached the end, delete and advance to next doc
+            const edit = new PadEdit();
+            edit.isInsert = false;
+            edit.index = 0;
+            edit.text = doc.text;
+            this.curDocIdx = (this.curDocIdx + 1) % this.docs.length;
+            this.curPosition = 0;
+            this.edits.next(edit);
+        }
+
+        const timeout = this.getNextTimeout();
+        if (this.isRunning()) this.requestId = window.setTimeout(this.onTick, timeout);
     };
 
     private getNextTimeout(): number {
