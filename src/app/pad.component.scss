@@ -20,16 +20,14 @@
     margin-top: 24px;
   }
 
- pad-page {
+  pad-page {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-
     display: flex;
     flex-flow: column nowrap;
-
     background-color: $color-editor;
     transition: .3s all linear;
 
@@ -195,6 +193,11 @@
   about {
     overflow: auto;
 
+    contents {
+      width: 600px;
+      padding: 0px 12px;
+    }
+
     logo {
       font-size: 48px;
       margin-top: 80px;
@@ -205,5 +208,4 @@
       margin: 40px 0;
     }
   }
-
 }
