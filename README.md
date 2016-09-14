@@ -27,7 +27,7 @@ The overarching goal of the project is to build a community capable of producing
 An important next step would be to produce (or lobby for) anonymizing plugins for popular Applicant Tracking Systems (like [Greenhouse](https://www.greenhouse.io/), [Lever](http://www.lever.co/), [Jobvite](http://www.jobvite.com/), and [Taleo](http://www.oracle.com/us/products/applications/taleo/enterprise/overview/index.html)).  With sufficient resources we could also start to produce an open-source ATS designed from the ground up to anonymize certain steps of the hiring process.
 
 ## How can I contribute to the project?
-If you’d like to support the project financially you can TODO.  Donations will be used to upgrade the public hosted version of Blindpad and to fund future development.
+If you’d like to support the project financially you can [click here](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VW2QSSP76L36N) to donate.  Donations will be used to upgrade the public hosted version of Blindpad and to fund ongoing development.
 
 If you’re inclined to contribute creatively (with code or design help) feel free to check out the repository, read over the project’s roadmap, and/or submit a pull request.
 
