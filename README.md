@@ -1,5 +1,15 @@
+**The publicly hosted version of Bindpad is available here: [blindpad.github.io](https://blindpad.github.io).**
+
 ## What is Blindpad?
 Blindpad is an [open source](https://github.com/blindpad/blindpad) collaborative text editor (like Google Docs or [CoderPad](https://coderpad.io)) with integrated semi-anonymizing voice chat intended to help reduce bias in technical communication.  In particular it can be used to extend the concept of “[blind auditions](https://en.wikipedia.org/wiki/Blind_audition)” to software programming and technical design interviews.  It is inspired by economists Claudia Goldin (Harvard) and Cecilia Rouse (Princeton) who concluded in [their 1997 paper](https://www.aeaweb.org/articles?id=10.1257/aer.90.4.715) that the introduction of blind auditions in professional orchestras is likely responsible for about one-third of the 250% increase in female membership between 1970 and the mid 1990s.
+
+For more information:
+- The New York Times Magazine. ["Is Blind Hiring the Best Hiring"](http://www.nytimes.com/2016/02/28/magazine/is-blind-hiring-the-best-hiring.html), Feb 25 2016
+- Atlantic Monthly. ["The False Promise of Meritocracy"](http://www.theatlantic.com/business/archive/2015/12/meritocracy/418074/), Dec 1 2015
+- NPR. ["Blind Auditions Could Give Employers A Better Hiring Sense"](http://www.npr.org/sections/alltechconsidered/2015/05/28/410264592/blind-auditions-could-give-employers-a-better-hiring-sense), May 28 2015
+- The Today Show. ["Companies using 'blind auditions' to hire top talent"](http://www.today.com/video/companies-using-blind-auditions-to-hire-top-talent-459650627844), Jun 8 2015
+- Fast Company. ["Can Blind Interviews Finally Solve Tech's Diversity Hiring Problem?"](http://www.fastcompany.com/3042618/strong-female-lead/can-blind-interviews-finally-solve-techs-diversity-hiring-problem), Feb 23 2015
+- Business Insider ["Why companies are using 'blind auditions' to hire top talent"](http://www.businessinsider.com/companies-are-using-blind-auditions-to-hire-top-talent-2015-5), May 31 2015
 
 ## How does it work?
 ### Semi-anonymizing voice chat
