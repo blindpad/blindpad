@@ -1,12 +1,13 @@
 import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, OnChanges, Input } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { Observer } from 'rxjs/Observer';
+import * as _ from 'lodash';
 
 import { buildEditor, getModeForMime, EditorMode } from '../util/CodeMirror';
 import { AutoEditor } from '../util/AutoEditor';
 import { EXAMPLES } from '../util/ExampleCode';
 import { PadModel } from '../services/PadModel';
-import { PadEdit } from '../signaler/Protocol';
+import { PadEdit, Cursor } from '../signaler/Protocol';
 
 // lots of handy stuff: https://github.com/Operational-Transformation/ot.js/blob/master/lib/codemirror-adapter.js
 
@@ -34,6 +35,8 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
     private remoteEditSub: Subscription;
     private localEdits: Observer<PadEdit[]>;
     private mimeSub: Subscription;
+
+    private remoteCursors: { [key: string]: CodeMirror.TextMarker } = {};
 
     constructor(
         private elementRef: ElementRef) { }
@@ -136,12 +139,12 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
             const edits: PadEdit[] = [];
             // nonempty removed = remove from from index
             if (removed.length > 0) {
-                const removeEdit: PadEdit = {isInsert: false, index: idx, text: removed };
+                const removeEdit: PadEdit = { isInsert: false, index: idx, text: removed };
                 edits.push(removeEdit);
             }
             // nonempt added = added at index
             if (inserted.length > 0) {
-                const insertEdit: PadEdit = {isInsert: true, index: idx, text: inserted };
+                const insertEdit: PadEdit = { isInsert: true, index: idx, text: inserted };
                 edits.push(insertEdit);
             }
             if (edits.length > 0 && this.localEdits) {
@@ -156,9 +159,54 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
 
     private getCursorPositions() {
         // give back what we believe to be the current positions of all cursors in the doc
+        // find on the selection objects
     }
 
-    private setCursorPositions() {
+    private setCursorPositions(newCursors: { [key: string]: Cursor }) {
+        if (!this.pad) return;
+        if (!newCursors) newCursors = {};
+
+        const doc = this.editor.getDoc();
+
+        _.each(newCursors, (cursor, id) => {
+            if (!cursor) return;
+            let marker = this.remoteCursors[id];
+
+            if (marker) { // existing markers can stay if they line up with what we've been told should be true
+                const existingPos = marker.find();
+                const start = doc.indexFromPos(existingPos.from);
+                const end = doc.indexFromPos(existingPos.to);
+                if (cursor.startIndex === start && cursor.endIndex === end) return;
+            }
+            //make bookmarks for zero-ranged cursors, marktext for others
+            doc.posFromIndex
+
+            const cursorEl = document.createElement('span') as HTMLSpanElement;
+            // cursorEl.className = 'other-client';
+            cursorEl.style.display = 'inline-block';
+            cursorEl.style.padding = '0';
+            cursorEl.style.marginLeft = cursorEl.style.marginRight = '-1px';
+            cursorEl.style.borderLeftWidth = '2px';
+            cursorEl.style.borderLeftStyle = 'solid';
+            cursorEl.style.borderLeftColor = 'red';
+            cursorEl.style.height = (cursorCoords.bottom - cursorCoords.top) * 0.9 + 'px';
+            cursorEl.style.zIndex = '0';
+        });
+
+        this.editor.getDoc().setBookmark
+        // // remove old cursors
+        // _.each(this.cursorElems, (elem, id) => {
+        //     // clear on selection objects
+        //     if (!newElems[id]) {
+        //         elem.remove();
+        //     }
+        // });
+
+        // if (!cursor && existing) { // clear the existing (if it exists) if we have a null entry in the new map
+        //     existing.clear();
+        //     delete this.remoteCursors[id];
+        // }
+
         // set cursors
     }
 

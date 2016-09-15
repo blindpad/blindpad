@@ -239,7 +239,7 @@ export class PadEdit {
     text: string;
 }
 
-export class CursorStatus {
+export class Cursor {
 
     /**
      * Whose cursor is it?
