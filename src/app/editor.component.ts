@@ -36,10 +36,10 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
     private localEdits: Observer<PadEdit[]>;
     private mimeSub: Subscription;
 
-    private remoteCursors: { [key: string]: CodeMirror.TextMarker } = {};
+    private remoteMarkers: Map<String, CodeMirror.TextMarker> = new Map<String, CodeMirror.TextMarker>();
 
     constructor(
-        private elementRef: ElementRef) { }
+        private elementRef: ElementRef) {}
 
     ngOnInit() {
         this.editor = buildEditor(this.elementRef.nativeElement);
@@ -91,6 +91,70 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
 
     onEditorClick(event: MouseEvent) {
         this.editor.focus();
+    }
+
+    getRemoteCursors(): { [key: string]: Cursor } {
+        const cursors: { [key: string]: Cursor} = {};
+        if (!this.editor) return cursors;
+
+        const doc = this.editor.getDoc();
+
+        this.remoteMarkers.forEach((marker: CodeMirror.TextMarker, id: string) => {
+            const cursor = new Cursor();
+            const range = marker.find();
+            cursor.srcId = id;
+            cursor.startIndex = doc.indexFromPos(range.from);
+            cursor.endIndex = doc.indexFromPos(range.to);
+            cursors[id] = cursor;
+        });
+
+        return cursors;
+    }
+
+    setRemoteCursors(cursors: { [key: string]: Cursor }) {
+        if (!this.pad) return;
+
+        const editor = this.editor;
+        const doc = editor.getDoc();
+        const oldMarkers = this.remoteMarkers || new Map<string, CodeMirror.TextMarker>();
+        const newMarkers = new Map<string, CodeMirror.TextMarker>();
+        this.remoteMarkers = newMarkers;
+
+        this.editor.operation(() => {
+            _.each(cursors, (cursor, id) => {
+                if (!cursor || cursor.startIndex === null || cursor.endIndex === null) return;
+                const start = Math.min(cursor.startIndex, cursor.endIndex);
+                const end = Math.max(cursor.startIndex, cursor.endIndex);
+
+                // existing markers can be reused if they haven't changed
+                if (oldMarkers.has(id)) {
+                    const oldMarker = oldMarkers.get(id);
+                    const oldMarkerPos = oldMarker.find();
+                    if (start === doc.indexFromPos(oldMarkerPos.from) && end === doc.indexFromPos(oldMarkerPos.to)) {
+                        newMarkers.set(id, oldMarker);
+                        oldMarkers.delete(id);
+                        return;
+                    }
+                }
+
+                // make bookmarks for zero-ranged cursors
+                if (start === end) {
+                    const cursorPos = doc.posFromIndex(start);
+                    const cursorEl = buildBookmarkElem(cursorPos, doc, editor);
+                    const newMarker = doc.setBookmark(cursorPos, { widget: cursorEl, insertLeft: true });
+                    newMarkers.set(id, newMarker);
+                    return;
+                }
+
+                // do a marktext for ranged cursors
+                // TODO: monkey with options to set color
+                const newMarker = doc.markText(doc.posFromIndex(start), doc.posFromIndex(end), {});
+                newMarkers.set(id, newMarker);
+            });
+
+            // clear the old markers
+            oldMarkers.forEach(marker => marker.clear());
+        });
     }
 
     private setDemoMode(demoMode: boolean) {
@@ -157,59 +221,6 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
         // we need this to get called when the local cursor changes
     }
 
-    private getCursorPositions() {
-        // give back what we believe to be the current positions of all cursors in the doc
-        // find on the selection objects
-    }
-
-    private setCursorPositions(newCursors: { [key: string]: Cursor }) {
-        if (!this.pad) return;
-        if (!newCursors) newCursors = {};
-
-        const doc = this.editor.getDoc();
-
-        _.each(newCursors, (cursor, id) => {
-            if (!cursor) return;
-            let marker = this.remoteCursors[id];
-
-            if (marker) { // existing markers can stay if they line up with what we've been told should be true
-                const existingPos = marker.find();
-                const start = doc.indexFromPos(existingPos.from);
-                const end = doc.indexFromPos(existingPos.to);
-                if (cursor.startIndex === start && cursor.endIndex === end) return;
-            }
-            //make bookmarks for zero-ranged cursors, marktext for others
-            doc.posFromIndex
-
-            const cursorEl = document.createElement('span') as HTMLSpanElement;
-            // cursorEl.className = 'other-client';
-            cursorEl.style.display = 'inline-block';
-            cursorEl.style.padding = '0';
-            cursorEl.style.marginLeft = cursorEl.style.marginRight = '-1px';
-            cursorEl.style.borderLeftWidth = '2px';
-            cursorEl.style.borderLeftStyle = 'solid';
-            cursorEl.style.borderLeftColor = 'red';
-            cursorEl.style.height = (cursorCoords.bottom - cursorCoords.top) * 0.9 + 'px';
-            cursorEl.style.zIndex = '0';
-        });
-
-        this.editor.getDoc().setBookmark
-        // // remove old cursors
-        // _.each(this.cursorElems, (elem, id) => {
-        //     // clear on selection objects
-        //     if (!newElems[id]) {
-        //         elem.remove();
-        //     }
-        // });
-
-        // if (!cursor && existing) { // clear the existing (if it exists) if we have a null entry in the new map
-        //     existing.clear();
-        //     delete this.remoteCursors[id];
-        // }
-
-        // set cursors
-    }
-
     private onCursorActivity = (instance: CodeMirror.Editor) => {
         // console.log('cursor activity: ', instance);
     };
@@ -222,4 +233,20 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
         // console.log('blur: ', instance);
     };
 
+}
+
+function buildBookmarkElem(pos: CodeMirror.Position, doc: CodeMirror.Doc, editor: CodeMirror.Editor): HTMLSpanElement {
+    const cursorCoords = editor.cursorCoords(pos, 'page');
+    const cursorEl = document.createElement('span') as HTMLSpanElement;
+    // cursorEl.className = 'other-client';
+    cursorEl.style.display = 'inline-block';
+    cursorEl.style.padding = '0';
+    cursorEl.style.marginLeft = cursorEl.style.marginRight = '-1px';
+    cursorEl.style.borderLeftWidth = '2px';
+    cursorEl.style.borderLeftStyle = 'solid';
+    cursorEl.style.borderLeftColor = 'red';
+    cursorEl.style.height = (cursorCoords.bottom - cursorCoords.top) * 0.9 + 'px';
+    cursorEl.style.zIndex = '0';
+
+    return cursorEl;
 }
