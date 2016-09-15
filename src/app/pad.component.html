@@ -1,5 +1,5 @@
-<welcome [@fadeInOut] *ngIf="getView() == PadView.Welcome">
-    <contents>
+<welcome-modal [@fadeInOut] *ngIf="getView() == PadView.Welcome">
+    <modal-body>
         <h1>blindpad is an <a href="https://www.github.com/blindpad/blindpad">open source</a> shared peer-to-peer text editor
             for collaborating on code and technical documents.</h1>
         <div *ngIf="media.needsCalibration() && browserIsSupported()">
@@ -21,10 +21,10 @@
         <p *ngIf="!hasWebAudio()" class="error">
             It looks like your browser doesn't currently support WebAudio. <a href="http://caniuse.com/#feat=audio-api">Click here</a>            for a list of compatible browsers.
         </p>
-    </contents>
-</welcome>
-<audio-setup [@fadeInOut] *ngIf="getView() == PadView.AudioSetup">
-    <contents>
+    </modal-body>
+</welcome-modal>
+<audio-modal [@fadeInOut] *ngIf="getView() == PadView.AudioSetup">
+    <modal-body>
         <div [@fadeInOut] *ngIf="!media.isCalibrating() && media.needsCalibration()">
             <h2>Audio Setup</h2>
             <div *ngIf="media.getCalibrationAttempts() == 0">
@@ -48,17 +48,17 @@
             <button class="start-button" [disabled]="media.getLocalStream().value == null" (click)="media.setCalibrating(!media.isCalibrating())">
                 {{media.isCalibrating() ? "Stop" : "Begin"}}
             </button>
-            <audio-monitor [analyser]="media.getLocalAnalyser()"></audio-monitor>
+            <audio-monitor class="voice" [analyser]="media.getLocalAnalyser()"></audio-monitor>
             <button class="opt-out-button text invert" *ngIf="!media.isCalibrating()" (click)="optOutOfVoice()">I don't want to use voice chat.</button>
-            <phrases [@fadeInOut] *ngIf="media.isCalibrating()">
+            <test-phrases [@fadeInOut] *ngIf="media.isCalibrating()">
                 <p *ngFor="let phrase of media.getPhrases()">{{phrase}}</p>
-            </phrases>
+            </test-phrases>
         </div>
-    </contents>
-</audio-setup>
-<about [@fadeInOut] *ngIf="getView() == PadView.About">
-    <contents>
-        <logo routerLink="/">blind<span class="primary">pad</span></logo>
+    </modal-body>
+</audio-modal>
+<about-modal [@fadeInOut] *ngIf="getView() == PadView.About">
+    <modal-body>
+        <bp-logo routerLink="/">blind<span class="primary">pad</span></bp-logo>
         <h2>What is Blindpad?</h2>
         <p>Blindpad is an <a href="https://github.com/blindpad/blindpad">open source</a> collaborative text editor (like Google
             Docs or <a href="https://coderpad.io">CoderPad</a>) with integrated semi-anonymizing voice chat intended to help
@@ -127,11 +127,11 @@
             including Typescript, Angular2, and libraries by <a href="https://github.com/mikolalysenko">@mikolalysenko</a>            and <a href="https://github.com/nkohari">@nkohari</a>.  See comments in the code for full attribution.  Blindpad
             is free software under the Apache License.</p>
         <a class="footer" routerLink="/">Blindpad Home</a>
-    </contents>
-</about>
+    </modal-body>
+</about-modal>
 <pad-page [class.disabled]="getView() != PadView.Editor" class="disabled">
     <pad-header>
-        <logo routerLink="/">blind<span class="primary">pad</span></logo>
+        <bp-logo routerLink="/">blind<span class="primary">pad</span></bp-logo>
         <nav *ngIf="hasPad()">
             <a class="invert" href="https://github.com/blindpad/blindpad/issues/new">feedback</a>
             <a class="invert" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VW2QSSP76L36N">donate</a>
@@ -148,11 +148,11 @@
         </nav>
     </pad-header>
     <pad-body>
-        <panel>
-            <users>
+        <pad-toolbar>
+            <pad-users>
                 <user *ngFor="let user of getUsers()" [model]="user"></user>
-            </users>
-        </panel>
+            </pad-users>
+        </pad-toolbar>
         <editor [pad]="getPad()"></editor>
     </pad-body>
 </pad-page>

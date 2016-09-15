@@ -18,9 +18,9 @@ require('../assets/bp_logo.png');
 
 require('../scss/global.scss');
 
-import { NgModule } from '@angular/core';
-import { BrowserModule  } from '@angular/platform-browser';
-import { RouterModule, RouterConfig }  from '@angular/router';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { RouterModule, Routes }  from '@angular/router';
 import { Title } from '@angular/platform-browser';
 
 import { BlindpadService } from '../services/blindpad.service';
@@ -32,7 +32,7 @@ import { AudioMonitorComponent } from './audio-monitor.component';
 import { EditorComponent } from './editor.component';
 import { UserComponent } from './user.component';
 
-const routes: RouterConfig = [
+const routes: Routes = [
     { path: 'pad/:id', component: PadComponent },
     { path: 'about', component: PadComponent },
     { path: 'support', component: PadComponent },
@@ -56,6 +56,7 @@ const routes: RouterConfig = [
         BlindpadService,
         MediaService
     ],
+    schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

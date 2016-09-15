@@ -4,6 +4,7 @@ import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/map';
 
 import { BlindpadService } from './blindpad.service';
 import { VoiceAnalyser } from '../util/VoiceAnalyser';

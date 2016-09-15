@@ -8,7 +8,7 @@
   width: 100%;
   height: 100%;
 
-  logo {
+  bp-logo {
     display: block;
     color: $color-primary-text;
     @include image-text();
@@ -58,7 +58,7 @@
       display: flex;
       align-items: center;
 
-      logo {
+      bp-logo {
         display: inline;
         margin-left: 8px;
         font-size: 14pt;
@@ -129,7 +129,7 @@
       display: flex;
       flex-flow: row;
 
-      panel {
+      pad-toolbar {
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
@@ -149,9 +149,9 @@
 
   /** overlays */
 
-  welcome,
-  audio-setup,
-  about {
+  welcome-modal,
+  audio-modal,
+  about-modal {
     position: absolute;
     top: 0;
     left: 0;
@@ -161,14 +161,14 @@
     display: flex;
     align-items: center;
 
-    contents {
+    modal-body {
       width: 400px;
       display: block;
       margin: auto;
     }
   }
 
-  welcome {
+  welcome-modal {
     .reconfigure-prompt {
       &,
       * {
@@ -178,7 +178,7 @@
     }
   }
 
-  audio-setup {
+  audio-modal {
     .start-button {
       display: inline-block;
       vertical-align: middle;
@@ -190,30 +190,22 @@
       width: 180px;
       margin-left: 12px;
       vertical-align: middle;
-
-      bar {
-        background-color: $color-disabled;
-      }
-
-      &.voice-active > bar {
-        background-color: $color-primary;
-      }
     }
 
-    phrases {
+    test-phrases {
       display: block;
     }
   }
 
-  about {
+  about-modal {
     overflow: auto;
 
-    contents {
+    modal-body {
       width: 600px;
       padding: 0px 12px;
     }
 
-    logo {
+    bp-logo {
       font-size: 48px;
       margin-top: 48px;
     }

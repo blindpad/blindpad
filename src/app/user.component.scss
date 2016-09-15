@@ -22,7 +22,7 @@ $mute-button-width: 29px;
     left: 0;
     z-index: 0;
 
-    bar {
+    monitor-bar {
       background-color: $color-disabled;
     }
 
@@ -69,7 +69,7 @@ $mute-button-width: 29px;
       }
     }
 
-    username {
+    user-name {
       flex: 1 1;
       text-overflow: ellipsis;
       overflow: hidden;

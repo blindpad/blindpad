@@ -17,7 +17,7 @@ const MAX_UPDATE_FPS = 45;
 
 @Component({
     selector: 'audio-monitor',
-    template: '<bar #bar></bar>',
+    template: '<monitor-bar #bar></monitor-bar>',
     styleUrls: ['audio-monitor.component.scss']
 })
 export class AudioMonitorComponent implements OnDestroy, OnChanges {

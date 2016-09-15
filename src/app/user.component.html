@@ -8,8 +8,8 @@
             <div class="double-bounce2"></div>
         </div>
     </user-icon>
-    <username [title]="connected ? name : 'Connecting...'">
+    <user-name [title]="connected ? name : 'Connecting...'">
         {{ connected ? name : 'Connecting...' }}
-    </username>
+    </user-name>
     <button *ngIf="connected" title="Mute" class="mute-button text" [class.muted]="model.getIsMuted().value" [class.voice-active]="voiceIsActive" [class.local-user]="model.isLocalUser()" (click)="model.setMuted()"></button>
 </div>
