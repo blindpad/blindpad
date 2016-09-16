@@ -40,6 +40,7 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
     private autoEditsSub: Subscription;
     private autoModeSub: Subscription;
 
+    private localUserId: string = null;
     private mimeSub: Subscription;
     private remoteEditSub: Subscription;
     private localEdits: Observer<PadEdit[]>;
@@ -59,9 +60,9 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
         this.autoModeSub = this.autoEditor.getMode().subscribe(this.setMode);
 
         this.editor.on('changes', this.onLocalEdits);
-        this.editor.on('cursorActivity', this.onCursorActivity);
-        this.editor.on('focus', this.onEditorFocus);
-        this.editor.on('blur', this.onEditorBlur);
+        this.editor.on('cursorActivity', this.onLocalCursors);
+        // this.editor.on('focus', this.onEditorFocus);
+        // this.editor.on('blur', this.onEditorBlur);
 
         this.ngOnChanges();
     }
@@ -72,14 +73,15 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
         this.autoModeSub.unsubscribe();
 
         this.editor.off('changes', this.onLocalEdits);
-        this.editor.off('cursorActivity', this.onCursorActivity);
-        this.editor.off('focus', this.onEditorFocus);
-        this.editor.off('blur', this.onEditorBlur);
+        this.editor.off('cursorActivity', this.onLocalCursors);
+        // this.editor.off('focus', this.onEditorFocus);
+        // this.editor.off('blur', this.onEditorBlur);
 
         this.ngOnChanges();
     }
 
     ngOnChanges() {
+        this.localUserId = null;
         if (this.mimeSub) {
             this.mimeSub.unsubscribe();
             this.mimeSub = null;
@@ -99,7 +101,7 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
         if (!this.editor) return;
         if (!pad || !pad.isStarted()) this.setDemoMode(true);
         if (!pad) return;
-
+        this.localUserId = pad.getLocalUser().getId();
         this.mimeSub = pad.getMimeType().subscribe(mime => this.setMode(getModeForMime(mime)));
         this.remoteEditSub = pad.getRemoteEdits().subscribe(this.onRemoteEdits);
         this.localEdits = pad.getLocalEdits();
@@ -109,6 +111,34 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
 
     onEditorClick(event: MouseEvent) {
         this.editor.focus();
+    }
+
+    private getLocalCursor(): Cursor {
+        if (!this.editor) return null;
+        const doc = this.editor.getDoc();
+
+        const selections = doc.listSelections();
+        const cursor = doc.getCursor();
+        let pos1: CodeMirror.Position;
+        let pos2: CodeMirror.Position;
+
+        if (selections && selections.length > 0) {
+            // if we for some reason have more than one selection just send the first one
+            pos1 = selections[0].anchor;
+            pos2 = selections[0].head;
+        } else if (cursor) {
+            pos1 = cursor;
+            pos2 = cursor;
+        }
+
+        if (!pos1 || !pos2) return null;
+        const result = new Cursor();
+        const idx1 = doc.indexFromPos(pos1);
+        const idx2 = doc.indexFromPos(pos2);
+        result.srcId = this.localUserId;
+        result.startIndex = Math.min(idx1, idx2);
+        result.endIndex = Math.max(idx1, idx2);
+        return result;
     }
 
     // private getRemoteCursors(): { [key: string]: Cursor } {
@@ -236,25 +266,12 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
         });
     }
 
-    private onLocalCursor = () => {
-
-    };
-
-    private onLocalCursorChanged() {
-        // we need this to get called when the local cursor changes
-    }
-
-    private onCursorActivity = (instance: CodeMirror.Editor) => {
-        // console.log('cursor activity: ', instance);
-    };
-
-    private onEditorFocus = (instance: CodeMirror.Editor) => {
-        //trigger cursor update
-        // console.log('focus: ', instance);
-    };
-
-    private onEditorBlur = (instance: CodeMirror.Editor) => {
-        // console.log('blur: ', instance);
+    private onLocalCursors = (instance: CodeMirror.Editor) => {
+        if (this.isDemoMode || this.applyingRemoteChanges || !this.localCursors) return;
+        const localCursor = this.getLocalCursor();
+        const update: CursorMap = {};
+        update[this.localUserId] = localCursor;
+        this.localCursors.next(update);
     };
 
 }
