@@ -224,24 +224,30 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
 
         const editor = this.editor;
         const doc = editor.getDoc();
-        const oldMarkers = this.remoteMarkers || new Map<string, CodeMirror.TextMarker>();
-        const newMarkers = new Map<string, CodeMirror.TextMarker>();
-        this.remoteMarkers = newMarkers;
+        const markers = this.remoteMarkers;
 
         this.editor.operation(() => {
             _.each(cursors, (cursor, id) => {
-                if (!cursor || cursor.startIndex === null || cursor.endIndex === null) return;
-                const start = Math.min(cursor.startIndex, cursor.endIndex);
-                const end = Math.max(cursor.startIndex, cursor.endIndex);
+                const start = cursor ? Math.min(cursor.startIndex, cursor.endIndex) : null;
+                const end = cursor ? Math.max(cursor.startIndex, cursor.endIndex) : null;
 
                 // existing markers can be reused if they haven't changed
-                if (oldMarkers.has(id)) {
-                    const oldMarker = oldMarkers.get(id);
+                if (markers.has(id)) {
+                    const oldMarker = markers.get(id);
                     const oldMarkerPos = oldMarker.find();
-                    if (start === doc.indexFromPos(oldMarkerPos.from) && end === doc.indexFromPos(oldMarkerPos.to)) {
-                        newMarkers.set(id, oldMarker);
-                        oldMarkers.delete(id);
-                        return;
+                    let oldMarkerStart = oldMarker ? doc.indexFromPos(oldMarkerPos.from) : null;
+                    let oldMarkerEnd = oldMarker ? doc.indexFromPos(oldMarkerPos.to) : null;
+                    if (oldMarkerStart > oldMarkerEnd) {
+                        const t = oldMarkerStart;
+                        oldMarkerStart = oldMarkerEnd;
+                        oldMarkerEnd = t;
+                    }
+                    // it's gone, out of date, or we've been asked to delete it
+                    if (!cursor || !oldMarkerPos || start !== oldMarkerStart || end !== oldMarkerEnd) {
+                        oldMarker.clear();
+                        markers.delete(id);
+                    } else {
+                        return; // it doesn't need to be changed
                     }
                 }
 
@@ -250,7 +256,7 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
                     const cursorPos = doc.posFromIndex(start);
                     const cursorEl = buildRemoteCursorElem(cursorPos, doc, editor);
                     const newMarker = doc.setBookmark(cursorPos, { widget: cursorEl, insertLeft: true });
-                    newMarkers.set(id, newMarker);
+                    markers.set(id, newMarker);
                     return;
                 }
 
@@ -258,11 +264,8 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
                 // TODO: monkey with options to set color
                 // TODO: could generate styles programmatically in the palette library for the color names
                 const newMarker = doc.markText(doc.posFromIndex(start), doc.posFromIndex(end), {});
-                newMarkers.set(id, newMarker);
+                markers.set(id, newMarker);
             });
-
-            // clear the old markers
-            oldMarkers.forEach(marker => marker.clear());
         });
     }
 

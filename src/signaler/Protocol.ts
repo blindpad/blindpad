@@ -147,7 +147,7 @@ export class PadUpdate {
     padId: string;
 
     /**
-     * What kind of text is being edited on this pad?
+     * (optional) If known: what kind of text is being edited on this pad?
      */
     mimeType: string;
 

@@ -315,7 +315,7 @@ export class UserModel {
         res.srcId = this.pad.getLocalUser().getId();
         res.destId = this.getId();
         res.name = this.pad.getLocalUser().getName().value;
-        if (sendPadUpdate) res.update = this.pad.buildPadUpdate();
+        if (sendPadUpdate) res.update = this.pad.buildPadUpdate(false);
         this.messagesOut.next({ type: UserStatusResponse.messageType, data: res });
     }
 
