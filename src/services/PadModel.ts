@@ -8,7 +8,14 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { KSeq, Op } from '../kseq';
-import { getSignalerURI, PeersRequest, PeersUpdate, ConnectionRequest, ConnectionResponse, PadEdit, PadUpdate, Message } from '../signaler/Protocol';
+import {
+    getSignalerURI,
+    Message,
+    PeersRequest, PeersUpdate,
+    ConnectionRequest, ConnectionResponse,
+    PadEdit, PadUpdate,
+    CursorMap
+} from '../signaler/Protocol';
 import { UserModel } from './UserModel';
 import { BlindpadService } from './blindpad.service';
 import { compressOpSet, decompressOpSet } from '../util/Compress';
@@ -34,8 +41,11 @@ export class PadModel {
     private memoizedOpSetStr: string;
 
     private outgoingUserBroadcasts: Subject<Message>;
+
     private localEdits: Subject<PadEdit[]>;
     private remoteEdits: Subject<PadEdit[]>;
+    private localCursors: Subject<CursorMap>;
+    private remoteCursors: Subject<CursorMap>;
 
     private delayedPadBroadcast: () => void;
 
@@ -62,6 +72,9 @@ export class PadModel {
         this.outgoingUserBroadcasts = new Subject<Message>();
         this.localEdits = new Subject<PadEdit[]>();
         this.remoteEdits = new Subject<PadEdit[]>();
+        this.localCursors = new Subject<CursorMap>();
+        this.remoteCursors = new Subject<CursorMap>();
+
         this.localEdits.subscribe(this.onLocalEdits);
 
         this.activePeers.add(this.clientId);
@@ -78,7 +91,8 @@ export class PadModel {
     getOutoingUserBroadcasts(): Observable<Message> { return this.outgoingUserBroadcasts; }
     getLocalEdits(): Observer<PadEdit[]> { return this.localEdits; }
     getRemoteEdits(): Observable<PadEdit[]> { return this.remoteEdits; }
-    getContents(): string { return this.doc.toArray().join(''); }
+    getLocalCursors(): Observer<CursorMap> { return this.localCursors; }
+    getRemoteCursors(): Observable<CursorMap> { return this.remoteCursors; }
 
     getMimeType(): BehaviorSubject<string> { return this.mimeType; }
     setMimeType(mime: string) { if (mime !== this.mimeType.value) this.mimeType.next(mime); }

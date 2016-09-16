@@ -152,9 +152,9 @@ export class PadUpdate {
     mimeType: string;
 
     /**
-     * Where are the cursors of various users on the pad?
+     * (optional) Where do we think are the cursors of various users on the pad?
      */
-    cursors: { [key: string]: CursorStatus };
+    cursors: CursorMap;
 
     /**
      * (optional) What is the latest version of the pad that we all agreed on? 
@@ -260,6 +260,8 @@ export class Cursor {
      */
     endIndex: number;
 }
+
+export type CursorMap = { [key: string]: Cursor };
 
 export interface Message {
     type: string;

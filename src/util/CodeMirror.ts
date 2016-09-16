@@ -131,6 +131,22 @@ export function getModeForMime(mime: string) {
     return MIME_TO_MODE[mime] || UNKNOWN_MODE;
 }
 
+export function buildRemoteCursorElem(pos: CodeMirror.Position, doc: CodeMirror.Doc, editor: CodeMirror.Editor): HTMLSpanElement {
+    const cursorCoords = editor.cursorCoords(pos, 'page');
+    const cursorEl = document.createElement('span') as HTMLSpanElement;
+    // cursorEl.className = 'other-client';
+    cursorEl.style.display = 'inline-block';
+    cursorEl.style.padding = '0';
+    cursorEl.style.marginLeft = cursorEl.style.marginRight = '-1px';
+    cursorEl.style.borderLeftWidth = '2px';
+    cursorEl.style.borderLeftStyle = 'solid';
+    cursorEl.style.borderLeftColor = 'red';
+    cursorEl.style.height = (cursorCoords.bottom - cursorCoords.top) * 0.9 + 'px';
+    cursorEl.style.zIndex = '0';
+
+    return cursorEl;
+}
+
 function filterModes(modes: EditorMode[]): EditorMode[] {
     if (!modes || modes.length === 0) return [];
     const availableMimes = CodeMirror['mimeModes'];
