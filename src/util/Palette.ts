@@ -43,3 +43,16 @@ export function getColor(idx: number, shuffled = false, primaryFirst = false): P
     const arr = shuffled ? (primaryFirst ? SHUFFLED_PRIMARY_FIRST : SHUFFLED_COLOR_NAMES) : COLOR_NAMES;
     return PRIMARY[arr[index]];
 }
+
+// const addStyleRule = (function () {
+//     const added = {};
+//     const styleElement = document.createElement('style');
+//     document.documentElement.getElementsByTagName('head')[0].appendChild(styleElement);
+//     const styleSheet: StyleSheet = styleElement.sheet;
+
+//     return function (css) {
+//         if (added[css]) { return; }
+//         added[css] = true;
+//         styleSheet.insertRule(css, (styleSheet.cssRules || styleSheet.rules).length);
+//     };
+// } ());
