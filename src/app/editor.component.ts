@@ -230,20 +230,32 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
             _.each(cursors, (cursor, id) => {
                 const start = cursor ? Math.min(cursor.startIndex, cursor.endIndex) : null;
                 const end = cursor ? Math.max(cursor.startIndex, cursor.endIndex) : null;
+                console.error('placing ', cursor, start, end);
 
                 // existing markers can be reused if they haven't changed
                 if (markers.has(id)) {
                     const oldMarker = markers.get(id);
                     const oldMarkerPos = oldMarker.find();
-                    let oldMarkerStart = oldMarker ? doc.indexFromPos(oldMarkerPos.from) : null;
-                    let oldMarkerEnd = oldMarker ? doc.indexFromPos(oldMarkerPos.to) : null;
-                    if (oldMarkerStart > oldMarkerEnd) {
-                        const t = oldMarkerStart;
-                        oldMarkerStart = oldMarkerEnd;
-                        oldMarkerEnd = t;
+                    let fromPos: CodeMirror.Position;
+                    let toPos: CodeMirror.Position;
+                    // typings are wrong, .find on a cursor gives back a pos not a range
+                    if (oldMarkerPos && oldMarkerPos.from === undefined) {
+                        fromPos = oldMarkerPos as any as CodeMirror.Position;
+                        toPos = oldMarkerPos as any as CodeMirror.Position;
+                    } else if (oldMarkerPos) {
+                        fromPos = oldMarkerPos.from;
+                        toPos = oldMarkerPos.to;
+                    }
+                    console.error('old: ', oldMarker, fromPos, toPos);
+                    let fromIdx = fromPos ? doc.indexFromPos(fromPos) : null;
+                    let toIdx = toPos ? doc.indexFromPos(toPos) : null;
+                    if (fromIdx > toIdx) {
+                        const t = fromIdx;
+                        fromIdx = toIdx;
+                        toIdx = t;
                     }
                     // it's gone, out of date, or we've been asked to delete it
-                    if (!cursor || !oldMarkerPos || start !== oldMarkerStart || end !== oldMarkerEnd) {
+                    if (!cursor || !oldMarkerPos || start !== fromIdx || end !== toIdx) {
                         oldMarker.clear();
                         markers.delete(id);
                     } else {
@@ -264,6 +276,7 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
                 // TODO: monkey with options to set color
                 // TODO: could generate styles programmatically in the palette library for the color names
                 const newMarker = doc.markText(doc.posFromIndex(start), doc.posFromIndex(end), {});
+                console.error('marktext: ', newMarker);
                 markers.set(id, newMarker);
             });
         });

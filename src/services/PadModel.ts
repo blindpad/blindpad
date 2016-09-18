@@ -313,6 +313,7 @@ export class PadModel {
         }
 
         if (update.cursors !== undefined) {
+            console.error('got cursors: ', update.cursors);
             const newCursors: CursorMap = {};
             _.each(update.cursors, (cursor, userId) => {
                 // ignore the cursor if they're not alive
