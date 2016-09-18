@@ -44,11 +44,36 @@ export function getColor(idx: number, shuffled = false, primaryFirst = false): P
     return PRIMARY[arr[index]];
 }
 
+const generatedRules: Map<string, string> = new Map<string, string>();
+export function getBackgroundClass(color: PaletteColor): string {
+    const className = `.color-${color.id}-background`;
+    if (generatedRules.has(className)) return className;
+    const rule = `${className} {
+        background: ${color.val};
+        color: ${color.darkText ? 'black' : 'white'};
+    }`;
+    generatedRules.set(className, rule);
+    const sheet = getSheet();
+    if (sheet) sheet.insertRule(rule, generatedRules.size); // silently fail if no sheet (because we're in a webworker or something)
+    return className;
+}
+
+let paletteSheet: CSSStyleSheet = null;
+function getSheet(): CSSStyleSheet {
+    if (paletteSheet !== null) return paletteSheet;
+    const doc = self.document;
+    if (!doc) return null;
+    const styleElem = doc.createElement('style');
+    doc.getElementsByTagName('head')[0].appendChild(styleElem);
+    paletteSheet = styleElem.sheet as CSSStyleSheet;
+    return paletteSheet;
+}
+
 // const addStyleRule = (function () {
 //     const added = {};
 //     const styleElement = document.createElement('style');
 //     document.documentElement.getElementsByTagName('head')[0].appendChild(styleElement);
-//     const styleSheet: StyleSheet = styleElement.sheet;
+//     const styleSheet = styleElement.sheet as CSSStyleSheet;
 
 //     return function (css) {
 //         if (added[css]) { return; }

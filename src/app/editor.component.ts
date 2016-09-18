@@ -11,6 +11,7 @@ import {
 } from '../util/CodeMirror';
 import { AutoEditor } from '../util/AutoEditor';
 import { EXAMPLES } from '../util/ExampleCode';
+import { getBackgroundClass, PRIMARY } from '../util/Palette';
 import { PadModel } from '../services/PadModel';
 import { PadEdit, Cursor, CursorMap } from '../signaler/Protocol';
 
@@ -61,8 +62,6 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
 
         this.editor.on('changes', this.onLocalEdits);
         this.editor.on('cursorActivity', this.onLocalCursors);
-        // this.editor.on('focus', this.onEditorFocus);
-        // this.editor.on('blur', this.onEditorBlur);
 
         this.ngOnChanges();
     }
@@ -74,8 +73,6 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
 
         this.editor.off('changes', this.onLocalEdits);
         this.editor.off('cursorActivity', this.onLocalCursors);
-        // this.editor.off('focus', this.onEditorFocus);
-        // this.editor.off('blur', this.onEditorBlur);
 
         this.ngOnChanges();
     }
@@ -225,9 +222,12 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
         const editor = this.editor;
         const doc = editor.getDoc();
         const markers = this.remoteMarkers;
+        const users = this.pad.getAllUsers();
 
         this.editor.operation(() => {
             _.each(cursors, (cursor, id) => {
+                const user = users.get(id);
+                const color = user ? user.getColor().value : PRIMARY.GREY;
                 const start = cursor ? Math.min(cursor.startIndex, cursor.endIndex) : null;
                 const end = cursor ? Math.max(cursor.startIndex, cursor.endIndex) : null;
                 console.error('placing ', cursor, start, end);
@@ -246,7 +246,6 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
                         fromPos = oldMarkerPos.from;
                         toPos = oldMarkerPos.to;
                     }
-                    console.error('old: ', oldMarker, fromPos, toPos);
                     let fromIdx = fromPos ? doc.indexFromPos(fromPos) : null;
                     let toIdx = toPos ? doc.indexFromPos(toPos) : null;
                     if (fromIdx > toIdx) {
@@ -266,16 +265,14 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
                 // make bookmarks for zero-ranged cursors
                 if (start === end) {
                     const cursorPos = doc.posFromIndex(start);
-                    const cursorEl = buildRemoteCursorElem(cursorPos, doc, editor);
+                    const cursorEl = buildRemoteCursorElem(cursorPos, color, doc, editor);
                     const newMarker = doc.setBookmark(cursorPos, { widget: cursorEl, insertLeft: true });
                     markers.set(id, newMarker);
                     return;
                 }
 
                 // do a marktext for ranged cursors
-                // TODO: monkey with options to set color
-                // TODO: could generate styles programmatically in the palette library for the color names
-                const newMarker = doc.markText(doc.posFromIndex(start), doc.posFromIndex(end), {});
+                const newMarker = doc.markText(doc.posFromIndex(start), doc.posFromIndex(end), { className: getBackgroundClass(color) });
                 console.error('marktext: ', newMarker);
                 markers.set(id, newMarker);
             });
