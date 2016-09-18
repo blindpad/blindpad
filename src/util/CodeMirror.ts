@@ -1,7 +1,5 @@
 import * as _ from 'lodash';
 
-import { PaletteColor } from './Palette';
-
 import * as CodeMirror from 'codemirror';
 require('../../node_modules/codemirror/lib/codemirror.css');
 
@@ -131,22 +129,6 @@ export function buildEditor(host: HTMLElement, options = DEFAULT_EDITOR_CONFIG) 
 export function getModeForMime(mime: string) {
     if (!mime) return DEFAULT_MODE;
     return MIME_TO_MODE[mime] || UNKNOWN_MODE;
-}
-
-export function buildRemoteCursorElem(pos: CodeMirror.Position, color: PaletteColor, doc: CodeMirror.Doc, editor: CodeMirror.Editor): HTMLSpanElement {
-    const cursorCoords = editor.cursorCoords(pos, 'page');
-    const cursorEl = document.createElement('span');
-    // cursorEl.className = 'other-client';
-    cursorEl.style.display = 'inline-block';
-    cursorEl.style.padding = '0';
-    cursorEl.style.marginLeft = cursorEl.style.marginRight = '-1px';
-    cursorEl.style.borderLeftWidth = '2px';
-    cursorEl.style.borderLeftStyle = 'solid';
-    cursorEl.style.borderLeftColor = color.val;
-    cursorEl.style.height = (cursorCoords.bottom - cursorCoords.top) * 0.9 + 'px';
-    cursorEl.style.zIndex = '0';
-
-    return cursorEl;
 }
 
 function filterModes(modes: EditorMode[]): EditorMode[] {

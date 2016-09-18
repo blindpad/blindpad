@@ -5,13 +5,12 @@ import * as _ from 'lodash';
 
 import {
     buildEditor,
-    buildRemoteCursorElem,
     getModeForMime,
     EditorMode
 } from '../util/CodeMirror';
 import { AutoEditor } from '../util/AutoEditor';
 import { EXAMPLES } from '../util/ExampleCode';
-import { getBackgroundClass, PRIMARY } from '../util/Palette';
+import { getBackgroundClass, PRIMARY, PaletteColor } from '../util/Palette';
 import { PadModel } from '../services/PadModel';
 import { PadEdit, Cursor, CursorMap } from '../signaler/Protocol';
 
@@ -138,23 +137,23 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
         return result;
     }
 
-    // private getRemoteCursors(): { [key: string]: Cursor } {
-    //     const cursors: { [key: string]: Cursor} = {};
-    //     if (!this.editor) return cursors;
+    private getRemoteCursors(): { [key: string]: Cursor } {
+        const cursors: { [key: string]: Cursor} = {};
+        if (!this.editor) return cursors;
 
-    //     const doc = this.editor.getDoc();
+        const doc = this.editor.getDoc();
 
-    //     this.remoteMarkers.forEach((marker: CodeMirror.TextMarker, id: string) => {
-    //         const cursor = new Cursor();
-    //         const range = marker.find();
-    //         cursor.srcId = id;
-    //         cursor.startIndex = doc.indexFromPos(range.from);
-    //         cursor.endIndex = doc.indexFromPos(range.to);
-    //         cursors[id] = cursor;
-    //     });
+        this.remoteMarkers.forEach((marker: CodeMirror.TextMarker, id: string) => {
+            const cursor = new Cursor();
+            const range = indicesFromMarker(marker, doc);
+            cursor.srcId = id;
+            cursor.startIndex = range.from;
+            cursor.endIndex = range.to;
+            cursors[id] = cursor;
+        });
 
-    //     return cursors;
-    // }
+        return cursors;
+    }
 
     private setDemoMode(demoMode: boolean) {
         if (demoMode === this.isDemoMode) return;
@@ -230,31 +229,13 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
                 const color = user ? user.getColor().value : PRIMARY.GREY;
                 const start = cursor ? Math.min(cursor.startIndex, cursor.endIndex) : null;
                 const end = cursor ? Math.max(cursor.startIndex, cursor.endIndex) : null;
-                console.error('placing ', cursor, start, end);
 
                 // existing markers can be reused if they haven't changed
                 if (markers.has(id)) {
                     const oldMarker = markers.get(id);
-                    const oldMarkerPos = oldMarker.find();
-                    let fromPos: CodeMirror.Position;
-                    let toPos: CodeMirror.Position;
-                    // typings are wrong, .find on a cursor gives back a pos not a range
-                    if (oldMarkerPos && oldMarkerPos.from === undefined) {
-                        fromPos = oldMarkerPos as any as CodeMirror.Position;
-                        toPos = oldMarkerPos as any as CodeMirror.Position;
-                    } else if (oldMarkerPos) {
-                        fromPos = oldMarkerPos.from;
-                        toPos = oldMarkerPos.to;
-                    }
-                    let fromIdx = fromPos ? doc.indexFromPos(fromPos) : null;
-                    let toIdx = toPos ? doc.indexFromPos(toPos) : null;
-                    if (fromIdx > toIdx) {
-                        const t = fromIdx;
-                        fromIdx = toIdx;
-                        toIdx = t;
-                    }
+                    const range = indicesFromMarker(oldMarker, doc);
                     // it's gone, out of date, or we've been asked to delete it
-                    if (!cursor || !oldMarkerPos || start !== fromIdx || end !== toIdx) {
+                    if (!cursor || start === null || end === null || start !== range.from || end !== range.to) {
                         oldMarker.clear();
                         markers.delete(id);
                     } else {
@@ -262,10 +243,12 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
                     }
                 }
 
+                if (!cursor || start === null || end === null) return;
+
                 // make bookmarks for zero-ranged cursors
                 if (start === end) {
                     const cursorPos = doc.posFromIndex(start);
-                    const cursorEl = buildRemoteCursorElem(cursorPos, color, doc, editor);
+                    const cursorEl = buildRemoteCursorElem(cursorPos, color);
                     const newMarker = doc.setBookmark(cursorPos, { widget: cursorEl, insertLeft: true });
                     markers.set(id, newMarker);
                     return;
@@ -273,7 +256,6 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
 
                 // do a marktext for ranged cursors
                 const newMarker = doc.markText(doc.posFromIndex(start), doc.posFromIndex(end), { className: getBackgroundClass(color) });
-                console.error('marktext: ', newMarker);
                 markers.set(id, newMarker);
             });
         });
@@ -283,8 +265,40 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
         if (this.isDemoMode || this.applyingRemoteChanges || !this.localCursors) return;
         const localCursor = this.getLocalCursor();
         const update: CursorMap = {};
+        _.each(this.getRemoteCursors(), (cursor, id) => update[id] = cursor);
         update[this.localUserId] = localCursor;
         this.localCursors.next(update);
     };
 
+}
+
+function indicesFromMarker(marker: CodeMirror.TextMarker, doc: CodeMirror.Doc): {from: number, to: number} {
+    if (!marker) return {from: null, to: null};
+    const range = marker.find();
+    if (!range) return {from: null, to: null};
+    let fromPos: CodeMirror.Position;
+    let toPos: CodeMirror.Position;
+    // typings are wrong, .find on a cursor gives back a pos not a range
+    if (range.from === undefined) {
+        fromPos = range as any as CodeMirror.Position;
+        toPos = range as any as CodeMirror.Position;
+    } else {
+        fromPos = range.from;
+        toPos = range.to;
+    }
+    let fromIdx = fromPos ? doc.indexFromPos(fromPos) : null;
+    let toIdx = toPos ? doc.indexFromPos(toPos) : null;
+    return (fromIdx > toIdx) ? {from: toIdx, to: fromIdx} : {from: fromIdx, to: toIdx};
+}
+
+function buildRemoteCursorElem(pos: CodeMirror.Position, color: PaletteColor): HTMLSpanElement {
+    const el = document.createElement('span');
+    el.style.display = 'inline';
+    el.style.padding = '0';
+    el.style.marginTop = el.style.marginBottom = el.style.marginLeft = el.style.marginRight = '-1px';
+    el.style.borderLeftWidth = '2px';
+    el.style.borderLeftStyle = 'solid';
+    el.style.borderLeftColor = color.val;
+    // el.style.zIndex = '0';
+    return el;
 }

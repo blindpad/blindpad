@@ -313,7 +313,6 @@ export class PadModel {
         }
 
         if (update.cursors !== undefined) {
-            console.error('got cursors: ', update.cursors);
             const newCursors: CursorMap = {};
             _.each(update.cursors, (cursor, userId) => {
                 // ignore the cursor if they're not alive
@@ -370,6 +369,9 @@ export class PadModel {
     }
 
     private onLocalCursors = (cursors: CursorMap) => {
+        // const test: CursorMap = {}; // test by making our local cursor into a remote cursor
+        // test[this.clientId] = cursors[this.clientId];
+        // this.remoteCursors.next(test);
         this.mostRecentCursors = cursors;
         this.firePadUpdate(true);
     };

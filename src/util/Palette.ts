@@ -46,15 +46,15 @@ export function getColor(idx: number, shuffled = false, primaryFirst = false): P
 
 const generatedRules: Map<string, string> = new Map<string, string>();
 export function getBackgroundClass(color: PaletteColor): string {
-    const className = `.color-${color.id}-background`;
+    const className = `color-${color.id}-background`;
     if (generatedRules.has(className)) return className;
-    const rule = `${className} {
+    const rule = `.${className} {
         background: ${color.val};
         color: ${color.darkText ? 'black' : 'white'};
     }`;
-    generatedRules.set(className, rule);
     const sheet = getSheet();
     if (sheet) sheet.insertRule(rule, generatedRules.size); // silently fail if no sheet (because we're in a webworker or something)
+    generatedRules.set(className, rule);
     return className;
 }
 
@@ -64,6 +64,8 @@ function getSheet(): CSSStyleSheet {
     const doc = self.document;
     if (!doc) return null;
     const styleElem = doc.createElement('style');
+    styleElem.type = 'text/css';
+    styleElem.className = 'palette';
     doc.getElementsByTagName('head')[0].appendChild(styleElem);
     paletteSheet = styleElem.sheet as CSSStyleSheet;
     return paletteSheet;
