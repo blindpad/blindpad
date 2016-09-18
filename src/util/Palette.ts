@@ -50,7 +50,7 @@ export function getBackgroundClass(color: PaletteColor): string {
     if (generatedRules.has(className)) return className;
     const rule = `.${className} {
         background: ${color.val};
-        color: ${color.darkText ? 'black' : 'white'};
+        color: ${color.darkText ? 'black' : 'white'} !important;
     }`;
     const sheet = getSheet();
     if (sheet) sheet.insertRule(rule, generatedRules.size); // silently fail if no sheet (because we're in a webworker or something)
