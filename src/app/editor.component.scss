@@ -1,9 +1,10 @@
-@import "./variables.scss";
 
+// TOOD: put this in a :host block and we can turn view encapsulation back on
 .CodeMirror {
     height: auto;
 }
 
+// TODO: fix this via a fancy angular pseudo-selector for searching up the tree
 .disabled {
     editor {
         .CodeMirror-linenumber {

@@ -8,7 +8,14 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { KSeq, Op } from '../kseq';
-import { getSignalerURI, PeersRequest, PeersUpdate, ConnectionRequest, ConnectionResponse, PadEdit, PadUpdate, Message } from '../signaler/Protocol';
+import {
+    getSignalerURI,
+    Message,
+    PeersRequest, PeersUpdate,
+    ConnectionRequest, ConnectionResponse,
+    PadEdit, PadUpdate,
+    CursorMap
+} from '../signaler/Protocol';
 import { UserModel } from './UserModel';
 import { BlindpadService } from './blindpad.service';
 import { compressOpSet, decompressOpSet } from '../util/Compress';
@@ -32,14 +39,17 @@ export class PadModel {
     private baseVersion: number;
     private opSet: Set<string>;
     private memoizedOpSetStr: string;
+    private mostRecentCursors: CursorMap;
 
     private outgoingUserBroadcasts: Subject<Message>;
+
     private localEdits: Subject<PadEdit[]>;
     private remoteEdits: Subject<PadEdit[]>;
+    private localCursors: Subject<CursorMap>;
+    private remoteCursors: Subject<CursorMap>;
 
-    private delayedPadBroadcast: () => void;
-
-    // private deadUserCheckSub: Subscription;
+    private debouncedPadUpdate: () => void;
+    private debouncedIsLightweight = true;
 
     constructor(
         private padId: string,
@@ -62,7 +72,11 @@ export class PadModel {
         this.outgoingUserBroadcasts = new Subject<Message>();
         this.localEdits = new Subject<PadEdit[]>();
         this.remoteEdits = new Subject<PadEdit[]>();
+        this.localCursors = new Subject<CursorMap>();
+        this.remoteCursors = new Subject<CursorMap>();
+
         this.localEdits.subscribe(this.onLocalEdits);
+        this.localCursors.subscribe(this.onLocalCursors);
 
         this.activePeers.add(this.clientId);
         this.updateUsers([], []);
@@ -78,23 +92,28 @@ export class PadModel {
     getOutoingUserBroadcasts(): Observable<Message> { return this.outgoingUserBroadcasts; }
     getLocalEdits(): Observer<PadEdit[]> { return this.localEdits; }
     getRemoteEdits(): Observable<PadEdit[]> { return this.remoteEdits; }
-    getContents(): string { return this.doc.toArray().join(''); }
+    getLocalCursors(): Observer<CursorMap> { return this.localCursors; }
+    getRemoteCursors(): Observable<CursorMap> { return this.remoteCursors; }
 
     getMimeType(): BehaviorSubject<string> { return this.mimeType; }
     setMimeType(mime: string) { if (mime !== this.mimeType.value) this.mimeType.next(mime); }
 
-    buildPadUpdate(): PadUpdate {
+    buildPadUpdate(isLightweight = true): PadUpdate {
         const update = new PadUpdate();
+        update.srcId = this.clientId;
         update.padId = this.padId;
         if (this.mimeType.value) update.mimeType = this.mimeType.value;
-        update.srcId = this.clientId;
-        update.base = this.base;
-        update.baseVersion = this.baseVersion;
+        if (this.mostRecentCursors) update.cursors = this.mostRecentCursors;
 
-        if (this.memoizedOpSetStr === null) {
-            this.memoizedOpSetStr = compressOpSet(this.opSet);
+        if (!isLightweight) {
+            update.base = this.base;
+            update.baseVersion = this.baseVersion;
+
+            if (this.memoizedOpSetStr === null) {
+                this.memoizedOpSetStr = compressOpSet(this.opSet);
+            }
+            update.opSetStr = this.memoizedOpSetStr;
         }
-        update.opSetStr = this.memoizedOpSetStr;
 
         return update;
     }
@@ -158,7 +177,7 @@ export class PadModel {
         this.signaler.on('disconnect', () => { this.log('disconnected from signaler'); });
 
         this.mimeType.subscribe(type => {
-            if (type) this.broadcastPadUpdate();
+            if (type) this.firePadUpdate(true);
         });
     }
 
@@ -179,9 +198,11 @@ export class PadModel {
             this.signaler.close();
         }
 
+        this.mimeType.complete();
         this.localEdits.complete();
         this.remoteEdits.complete();
-        this.mimeType.complete();
+        this.localCursors.complete();
+        this.remoteCursors.complete();
     }
 
     isStarted(): boolean {
@@ -226,7 +247,13 @@ export class PadModel {
                     if (!user.isStarted()) user.start();
                 }
                 if (this.deadPeers.has(peerId)) {
-                    if (!user.isClosed()) user.close();
+                    if (!user.isClosed()) {
+                        user.close();
+                        // make sure to clear the cursor of anyone we see die
+                        const tombstoneCursor: CursorMap = {};
+                        tombstoneCursor[peerId] = null;
+                        this.remoteCursors.next(tombstoneCursor);
+                    }
                 }
             });
         });
@@ -253,46 +280,57 @@ export class PadModel {
         if (newOps.length > 0) {
             newOps.forEach(op => this.opSet.add(op.toString()));
             this.memoizedOpSetStr = null; // clear a saved value since we changed the canonical one
-
-            // we should only fire the pad broadcast after the user stops typing
-            if (!this.delayedPadBroadcast) {
-                // the bigger the opset the longer we should let people
-                const delay = 25 * Math.pow(Math.log10(this.opSet.size + 1), 2);
-                this.delayedPadBroadcast = _.debounce(() => {
-                    this.broadcastPadUpdate();
-                    this.delayedPadBroadcast = null;
-                }, delay);
-            }
-            this.delayedPadBroadcast();
+            this.firePadUpdate(false);
         }
     };
 
     private onPadUpdate = (update: PadUpdate) => {
-        if (update.mimeType && update.mimeType !== this.mimeType.value) {
+        if (update.mimeType !== undefined && update.mimeType !== this.mimeType.value) {
             this.mimeType.next(update.mimeType);
         }
 
-        if (this.base === update.base && this.baseVersion === update.baseVersion) {
-            // regular update: we agree on base and version, let's just combine our ops and be done
-            const opsToApply: string[] = [];
-            const haveUpdate = !!update.opSetStr;
-            const sameAsMemoized = this.memoizedOpSetStr && this.memoizedOpSetStr === update.opSetStr;
-            if (haveUpdate && !sameAsMemoized) {
-                decompressOpSet(update.opSetStr).forEach(op => {
-                    if (!this.opSet.has(op)) opsToApply.push(op);
-                });
+        if (update.base !== undefined && update.baseVersion !== undefined && update.opSetStr !== undefined) {
+            if (this.base === update.base && this.baseVersion === update.baseVersion) {
+                // regular update: we agree on base and version, let's just combine our ops and be done
+                const opsToApply: string[] = [];
+                const haveUpdate = !!update.opSetStr;
+                const sameAsMemoized = this.memoizedOpSetStr && this.memoizedOpSetStr === update.opSetStr;
+                if (haveUpdate && !sameAsMemoized) {
+                    decompressOpSet(update.opSetStr).forEach(op => {
+                        if (!this.opSet.has(op)) opsToApply.push(op);
+                    });
+                }
+                this.applyOpsAndRender(opsToApply);
+            } else if (update.baseVersion > this.baseVersion) {
+                // remote is newer, blow ours away
+                this.log(`Overwriting local doc: remote version is ${update.baseVersion} and we are ${this.baseVersion}`);
+                this.base = update.base;
+                this.baseVersion = update.baseVersion;
+                this.opSet = new Set<string>();
+                this.applyOpsAndRender(decompressOpSet(update.opSetStr));
             }
-            this.applyOpsAndRender(opsToApply);
-        } else if (update.baseVersion > this.baseVersion) {
-            // remote is newer, blow ours away
-            this.log(`Overwriting local doc: remote version is ${update.baseVersion} and we are ${this.baseVersion}`);
-            this.base = update.base;
-            this.baseVersion = update.baseVersion;
-            this.opSet = new Set<string>();
-            this.applyOpsAndRender(decompressOpSet(update.opSetStr));
+            // TODO: still the case where we have the same version but different bases: maybe the older client should win?
         }
 
-        // TODO: still the case where we have the same version but different bases: maybe the older client should win?
+        if (update.cursors !== undefined) {
+            const newCursors: CursorMap = {};
+            _.each(update.cursors, (cursor, userId) => {
+                // ignore the cursor if they're not alive
+                if (!this.activeUsers.has(userId)) return;
+                // ignore ours (this is only for remote cursors: we trust ourselves to know our own cursor)
+                if (userId === this.clientId) return;
+
+                // we could either take every cursor with every update
+                // or we could only update the ones coming authoritatively from the sender
+                // of the update and allow the pad changes / codemirror logic to do the rest.
+                // we're going to do the latter for now
+                if (userId === update.srcId) {
+                    newCursors[userId] = cursor;
+                }
+            });
+            this.remoteCursors.next(newCursors);
+        }
+
     };
 
     private applyOpsAndRender(ops: string[]) {
@@ -330,8 +368,31 @@ export class PadModel {
         if (edits.length > 0) this.remoteEdits.next(edits);
     }
 
-    private broadcastPadUpdate() {
-        this.outgoingUserBroadcasts.next({ type: PadUpdate.messageType, data: this.buildPadUpdate() });
+    private onLocalCursors = (cursors: CursorMap) => {
+        // const test: CursorMap = {}; // test by making our local cursor into a remote cursor
+        // test[this.clientId] = cursors[this.clientId];
+        // this.remoteCursors.next(test);
+        this.mostRecentCursors = cursors;
+        this.firePadUpdate(true);
+    };
+
+    /**
+     * Broadcast an update in our version of the pad to other users: to save on bandwidth
+     * calls to this will be debounced based on the size of the current opSet (which dominates the
+     * size of the message).
+     */
+    private firePadUpdate(isLightweight: boolean) {
+        this.debouncedIsLightweight = !!this.debouncedIsLightweight && isLightweight;
+
+        if (!this.debouncedPadUpdate) {
+            const delay = 25 * Math.pow(Math.log10(this.opSet.size + 1), 2);
+            this.debouncedPadUpdate = _.debounce(() => {
+                this.outgoingUserBroadcasts.next({ type: PadUpdate.messageType, data: this.buildPadUpdate(this.debouncedIsLightweight) });
+                this.debouncedPadUpdate = null;
+                this.debouncedIsLightweight = true;
+            }, delay);
+        }
+        this.debouncedPadUpdate();
     }
 
     private signalRequest = (req: ConnectionRequest) => {

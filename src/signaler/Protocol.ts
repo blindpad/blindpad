@@ -147,22 +147,27 @@ export class PadUpdate {
     padId: string;
 
     /**
-     * What kind of text is being edited on this pad?
+     * (optional) If known: what kind of text is being edited on this pad?
      */
     mimeType: string;
 
     /**
-     * What is the latest version of the pad that we all agreed on?
+     * (optional) Where do we think are the cursors of various users on the pad?
+     */
+    cursors: CursorMap;
+
+    /**
+     * (optional) What is the latest version of the pad that we all agreed on? 
      */
     base: string;
 
     /**
-     * How many times has this swarm updated the base version?
+     * (optional) How many times has this swarm updated the base version?
      */
     baseVersion: number;
 
     /**
-     * A compressed representation of the set of operations that have been applied to the base
+     * (optional) A compressed representation of the set of operations that have been applied to the base
      * since the last time we all agreed on a base version?
      */
     opSetStr: string;
@@ -217,7 +222,6 @@ export class UserStatusResponse {
 }
 
 export class PadEdit {
-    static messageType = 'PadEdit';
 
     /**
      * Otherwise a delete
@@ -234,6 +238,30 @@ export class PadEdit {
      */
     text: string;
 }
+
+export class Cursor {
+
+    /**
+     * Whose cursor is it?
+     */
+    srcId: string;
+
+    /**
+     * Where does it start?
+     * - null means there is no selection
+     * - start and end will be the same if there's no selection
+     */
+    startIndex: number;
+
+    /**
+     * Where does it end?
+     * - null means there is no selection
+     * - start and end will be the same if there's no selection
+     */
+    endIndex: number;
+}
+
+export type CursorMap = { [key: string]: Cursor };
 
 export interface Message {
     type: string;
