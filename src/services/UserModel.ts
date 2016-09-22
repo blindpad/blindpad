@@ -40,8 +40,15 @@ const DATA_CHANNEL_CONFIG: RTCDataChannelInit = {
 const DATA_CHANNEL_NAME = 'bp';
 const DATA_CHANNEL_MAX_MESSAGE_SIZE = 60000; // the internet says not to go over 64k with webrtc data channels right now
 
-export const HEARTBEAT_FREQUENCY_MS = 30000;
-// export const USER_TIMEOUT = 3.5 * HEARTBEAT_FREQUENCY_MS;
+/**
+ * How often should we send proactive heartbeats to another user?
+ */
+const HEARTBEAT_FREQUENCY_MS = 5000;
+
+/**
+ * Any user who hasn't responded within this amount of time is considered fair game to be timed out
+ */
+const USER_TIMEOUT = 3.5 * HEARTBEAT_FREQUENCY_MS;
 
 export class UserModel {
 
@@ -64,7 +71,7 @@ export class UserModel {
 
     private broadcastSub: Subscription;
     private heartbeatSub: Subscription;
-    private lastHeartbeatReponseTime: number;
+    private lastMessageTime: number;
 
     constructor(
         private userId: string,
@@ -90,7 +97,7 @@ export class UserModel {
 
         this.broadcastSub = null;
         this.heartbeatSub = null;
-        this.lastHeartbeatReponseTime = null;
+        this.lastMessageTime = null;
     }
 
     getId(): string { return this.userId; }
@@ -100,6 +107,7 @@ export class UserModel {
     isRemoteUser(): boolean { return !this.isLocalUser(); }
     isClosed(): boolean { return this.closed; }
     isStarted(): boolean { return this.started; }
+    isUnresponsive(): boolean { return this.isRemoteUser() && Date.now() - this.lastMessageTime > USER_TIMEOUT; }
 
     getAudioStream(): BehaviorSubject<MediaStream> { return this.audioStream; }
     getIsMuted() { return this.isMuted; }
@@ -131,7 +139,7 @@ export class UserModel {
         }
 
         this.color.next(getColor(this.pad.getUsers() ? this.pad.getUsers().size : 0, true, true));
-        this.lastHeartbeatReponseTime = Date.now();
+        this.lastMessageTime = Date.now();
 
         this.setupSubs();
         this.setupRtc();
@@ -179,6 +187,7 @@ export class UserModel {
 
         // when the dechunker emits a message send it to our local pipe
         this.dechunker.messages.subscribe(message => {
+            this.lastMessageTime = Date.now();
             // console.error('received msg: ', message.length, message.substring(0, 20));
             this.messagesIn.next(JSON.parse(message));
         });
@@ -219,7 +228,6 @@ export class UserModel {
                 this.pad.log('Received name from ', response.srcId, ' / ', response.name);
                 this.name.next(response.name);
             }
-            this.lastHeartbeatReponseTime = Date.now();
             // if we got an update then feed it to ourselves
             if (response.update) this.feedMessage(PadUpdate.messageType, response.update);
         });

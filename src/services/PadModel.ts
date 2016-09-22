@@ -6,6 +6,7 @@ import { Subject } from 'rxjs/Subject';
 import { Observer } from 'rxjs/Observer';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription } from 'rxjs/Subscription';
 
 import { KSeq, Op } from '../kseq';
 import {
@@ -20,16 +21,23 @@ import { UserModel } from './UserModel';
 import { BlindpadService } from './blindpad.service';
 import { compressOpSet, decompressOpSet } from '../util/Compress';
 import { diffStrings, DIFF_DELETE, DIFF_INSERT } from '../util/Diff';
+import { interval } from '../util/Observables';
+
+/**
+ * After how many milliseconds without an edit can we trigger a pad compaction (assuming all other conditions are met?)
+ */
+const COMPACTION_DELAY_MS = 4000;
+
+const PEER_TIMEOUT_POLL_MS = 20000;
+const COMPACTION_POLL_MS = 1000;
 
 export class PadModel {
     private useLog = true;
-    private signaler: SocketIOClient.Socket;
 
     private clientId: string;
-
+    private signaler: SocketIOClient.Socket;
     private activePeers: Set<string>;
     private deadPeers: Set<string>;
-
     private users: Map<string, UserModel>;
     private activeUsers: Map<string, UserModel>;
 
@@ -40,6 +48,7 @@ export class PadModel {
     private opSet: Set<string>;
     private memoizedOpSetStr: string;
     private mostRecentCursors: CursorMap;
+    private lastEditTime: number;
 
     private outgoingUserBroadcasts: Subject<Message>;
 
@@ -50,6 +59,9 @@ export class PadModel {
 
     private debouncedPadUpdate: () => void;
     private debouncedIsLightweight = true;
+
+    private peerTimeoutSub: Subscription;
+    private compactionSub: Subscription;
 
     constructor(
         private padId: string,
@@ -63,11 +75,8 @@ export class PadModel {
         this.users = new Map<string, UserModel>();
 
         this.mimeType = new BehaviorSubject(null);
-        this.doc = new KSeq<string>(this.clientId.substring(0, 6)); // this is probably way too collision-happy
-        this.base = '';
-        this.baseVersion = 0;
-        this.opSet = new Set<string>();
-        this.memoizedOpSetStr = null;
+        this.setBaseDoc('', 0);
+        this.mostRecentCursors = null;
 
         this.outgoingUserBroadcasts = new Subject<Message>();
         this.localEdits = new Subject<PadEdit[]>();
@@ -77,6 +86,9 @@ export class PadModel {
 
         this.localEdits.subscribe(this.onLocalEdits);
         this.localCursors.subscribe(this.onLocalCursors);
+
+        this.localEdits.subscribe(edits => this.lastEditTime = Date.now());
+        this.remoteEdits.subscribe(edits => this.lastEditTime = Date.now());
 
         this.activePeers.add(this.clientId);
         this.updateUsers([], []);
@@ -179,30 +191,27 @@ export class PadModel {
         this.mimeType.subscribe(type => {
             if (type) this.firePadUpdate(true);
         });
+
+        this.peerTimeoutSub = interval(PEER_TIMEOUT_POLL_MS).subscribe(this.onPeerTimeoutTick);
+        this.compactionSub = interval(COMPACTION_POLL_MS).subscribe(this.onCompactionTick);
     }
 
     close() {
         if (!this.isStarted()) return;
-        this.updateUsers([], [this.clientId]);
-        const update = new PeersUpdate();
-        update.padId = this.padId;
-        update.srcId = this.clientId;
-        update.activePeers = Array.from(this.activePeers.values());
-        update.deadPeers = Array.from(this.deadPeers.values());
-        this.signaler.emit(PeersUpdate.messageType, update);
-
+        this.killUsersAndSignal([this.clientId]);
         this.users.forEach(user => { user.close(); });
         this.users.clear();
 
-        if (this.signaler) {
-            this.signaler.close();
-        }
+        if (this.signaler) this.signaler.close();
 
         this.mimeType.complete();
         this.localEdits.complete();
         this.remoteEdits.complete();
         this.localCursors.complete();
         this.remoteCursors.complete();
+
+        this.peerTimeoutSub.unsubscribe();
+        this.compactionSub.unsubscribe();
     }
 
     isStarted(): boolean {
@@ -304,9 +313,7 @@ export class PadModel {
             } else if (update.baseVersion > this.baseVersion) {
                 // remote is newer, blow ours away
                 this.log(`Overwriting local doc: remote version is ${update.baseVersion} and we are ${this.baseVersion}`);
-                this.base = update.base;
-                this.baseVersion = update.baseVersion;
-                this.opSet = new Set<string>();
+                this.setBaseDoc(update.base, update.baseVersion);
                 this.applyOpsAndRender(decompressOpSet(update.opSetStr));
             }
             // TODO: still the case where we have the same version but different bases: maybe the older client should win?
@@ -369,9 +376,6 @@ export class PadModel {
     }
 
     private onLocalCursors = (cursors: CursorMap) => {
-        // const test: CursorMap = {}; // test by making our local cursor into a remote cursor
-        // test[this.clientId] = cursors[this.clientId];
-        // this.remoteCursors.next(test);
         this.mostRecentCursors = cursors;
         this.firePadUpdate(true);
     };
@@ -387,12 +391,87 @@ export class PadModel {
         if (!this.debouncedPadUpdate) {
             const delay = 25 * Math.pow(Math.log10(this.opSet.size + 1), 2);
             this.debouncedPadUpdate = _.debounce(() => {
-                this.outgoingUserBroadcasts.next({ type: PadUpdate.messageType, data: this.buildPadUpdate(this.debouncedIsLightweight) });
+                this.sendUpdateNow(this.debouncedIsLightweight);
                 this.debouncedPadUpdate = null;
                 this.debouncedIsLightweight = true;
             }, delay);
         }
         this.debouncedPadUpdate();
+    }
+
+    private sendUpdateNow(isLightweight: boolean) {
+        this.outgoingUserBroadcasts.next({ type: PadUpdate.messageType, data: this.buildPadUpdate(isLightweight) });
+    }
+
+    private onCompactionTick = () => {
+        // conditions under which we should broadcast a compaction:
+        // we're not dead
+        if (!this.activePeers.has(this.clientId)) return;
+        // we have an opset
+        if (this.opSet.size === 0) return;
+        // we're the largest client id in the swarm (kind of a janky master)
+        if (this.clientId !== _.max(Array.from(this.activePeers))) return;
+        // we're either by ourself or we have at least one responsive peer (i.e. we're not totally isolated from the swarm)
+        if (this.activePeers.size > 1 && this.getResponsivePeers().length === 0) return;
+        // it's been more than a certain fixed amount of time since the last pad edit
+        if (Date.now() - this.lastEditTime < COMPACTION_DELAY_MS) return;
+
+        this.setBaseDoc(this.doc.toArray().join(''), this.baseVersion + 1);
+        this.sendUpdateNow(false);
+        console.error('master compacted!');
+    };
+
+    private onPeerTimeoutTick = () => {
+        // conditions under which we should broadcast time-out / unresponsive peers as dead
+        // we're not dead
+        if (!this.activePeers.has(this.clientId)) return;
+        // we have peers
+        if (this.activePeers.size < 2) return;
+        // at least one of them is unresponsive
+        if (this.getUnresponsivePeers().length === 0) return;
+
+        // we can hit the network (to ensure we're not isolated)
+        const req = new XMLHttpRequest();
+        req.onreadystatechange = () => {
+            if (req.readyState !== XMLHttpRequest.DONE || req.status !== 200) return;
+            // we know we're online
+            const unresponsiveIds = this.getUnresponsivePeers().map(user => user.getId());
+            if (unresponsiveIds.length > 0) this.killUsersAndSignal(unresponsiveIds);
+        };
+        req.timeout = PEER_TIMEOUT_POLL_MS / 2;
+        req.open('GET', `/index.html?t=${Date.now()}`, true); // prevent caching
+        req.send();
+    }
+
+    private getResponsivePeers(): Array<UserModel> {
+        return Array.from(this.activeUsers.values()).filter(user => user.isRemoteUser() && !user.isUnresponsive());
+    }
+
+    private getUnresponsivePeers(): Array<UserModel> {
+        return Array.from(this.activeUsers.values()).filter(user => user.isRemoteUser() && user.isUnresponsive());
+    }
+
+    private killUsersAndSignal(peerIds: Array<string>) {
+        this.updateUsers([], peerIds);
+        const update = new PeersUpdate();
+        update.padId = this.padId;
+        update.srcId = this.clientId;
+        update.activePeers = Array.from(this.activePeers.values());
+        update.deadPeers = Array.from(this.deadPeers.values());
+        this.signaler.emit(PeersUpdate.messageType, update);
+    }
+
+    private setBaseDoc(base: string, version: number) {
+        this.base = base;
+        this.baseVersion = version;
+        this.doc = new KSeq<string>(this.clientId.substring(0, 6)); // this is probably way too collision-happy
+        for (let i = 0, l = base.length; i < l; i++) {
+            this.doc.insert(base.charAt(i), i);
+        }
+        this.opSet = new Set<string>();
+        this.memoizedOpSetStr = null;
+        this.lastEditTime = Date.now();
+        console.error('base: ', this.base, this.baseVersion, this.opSet, this.doc.toArray());
     }
 
     private signalRequest = (req: ConnectionRequest) => {
@@ -405,7 +484,7 @@ export class PadModel {
 
     private isValidMessage(msg: PeersRequest | PeersUpdate | ConnectionRequest | ConnectionResponse): boolean {
         if (msg.padId !== this.padId) {
-            console.log(`Message padId (${msg.padId}) doesn't match local padId: ${this.padId}, ingoring...`); // tslint:disable-line
+            console.log(`Message padId (${msg.padId}) doesn't match local padId: ${this.padId}, ignoring...`); // tslint:disable-line
             return false;
         }
         return true;
