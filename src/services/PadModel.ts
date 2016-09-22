@@ -22,6 +22,7 @@ import { BlindpadService } from './blindpad.service';
 import { compressOpSet, decompressOpSet } from '../util/Compress';
 import { diffStrings, DIFF_DELETE, DIFF_INSERT } from '../util/Diff';
 import { interval } from '../util/Observables';
+import { SeededRandom } from '../util/Random';
 
 /**
  * After how many milliseconds without an edit can we trigger a pad compaction (assuming all other conditions are met?)
@@ -290,7 +291,7 @@ export class PadModel {
             newOps.forEach(op => this.opSet.add(op.toString()));
             this.memoizedOpSetStr = null; // clear a saved value since we changed the canonical one
             this.firePadUpdate(false);
-            console.error('local ops happened: ', this.opSet, this.base, this.doc.toArray().join(''), this.baseVersion);
+            console.error(`local ops: v${this.baseVersion}, "${this.doc.toArray().join('')}"`, this.opSet);
         }
     };
 
@@ -317,7 +318,7 @@ export class PadModel {
                 this.setBaseDoc(update.base, update.baseVersion);
                 this.applyOpsAndRender(decompressOpSet(update.opSetStr));
             }
-            console.error('update applied: ', this.opSet, this.base, this.doc.toArray().join(''), this.baseVersion);
+            console.error(`updated to: v${this.baseVersion}, "${this.doc.toArray().join('')}"`, this.opSet);
             // TODO: still the case where we have the same version but different bases: maybe the older client should win?
         }
 
@@ -406,6 +407,7 @@ export class PadModel {
     }
 
     private onCompactionTick = () => {
+        // if (1 === 1) return; // disble compaction
         // conditions under which we should broadcast a compaction:
         // we're not dead
         if (!this.activePeers.has(this.clientId)) return;
@@ -420,7 +422,7 @@ export class PadModel {
 
         this.setBaseDoc(this.doc.toArray().join(''), this.baseVersion + 1);
         this.sendUpdateNow(false);
-        console.error('we are master and we broadcast a compaction to: ', this.base, this.baseVersion);
+        console.error(`master:compaction v${this.baseVersion} "${this.base}"`);
     };
 
     private onPeerTimeoutTick = () => {
@@ -472,7 +474,9 @@ export class PadModel {
 
         // for correctness our "base" text" just implies a set of operations
         // that all peers agree on (in this case made by a simulated third party)
-        const baseDoc = new KSeq<string>('' + version);
+        const rng = new SeededRandom(version);
+        console.error(rng.random(), rng.random(), rng.random());
+        const baseDoc = new KSeq<string>('' + version, () => version, () => rng.random());
         for (let i = 0, l = base.length; i < l; i++) {
             this.doc.apply(baseDoc.insert(base.charAt(i), i));
         }
@@ -491,7 +495,7 @@ export class PadModel {
             add.text = this.base;
             this.remoteEdits.next([remove, add]);
         }
-        console.error('base is now: ', this.base, this.baseVersion, this.opSet, this.doc.toArray().join(''));
+        console.error(`base now v${this.baseVersion}: "${this.base}"`);
     }
 
     private signalRequest = (req: ConnectionRequest) => {

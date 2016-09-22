@@ -34,18 +34,25 @@ export class KSeq<T> {
   private identGenerator: IdentGenerator;
 
   /**
+   * The function we should call when we want to know what time it is
+   */
+  private timestampFn: () => number;
+
+  /**
    * Creates an instance of KSeq<T>.
    * @param name           The unique name for this replica.
+   * @param timestampFn    We'll call this when we need to know what time it is (default is wall-clock unix time)
    * @param atoms          The backing storage, if null, creates a new ArrayAtomList<T>.
    * @param identGenerator The id generator, if null, creates a new LSEQIdentGenerator.
    * @returns An instance of KSeq<T>.
    */
-  constructor(name: string, atoms?: AtomList<T>, identGenerator?: IdentGenerator) {
+  constructor(name: string, timestampFn?: () => number, randomFn?: () => number, atoms?: AtomList<T>, identGenerator?: IdentGenerator) {
     this.name = name;
     this.time = 0;
     this.atoms = atoms || new ArrayAtomList<T>();
     this.removed = new IdentSet();
-    this.identGenerator = identGenerator || new LSEQIdentGenerator();
+    this.identGenerator = identGenerator || new LSEQIdentGenerator(randomFn);
+    this.timestampFn = timestampFn || unixTime;
   }
 
   /**
@@ -82,7 +89,7 @@ export class KSeq<T> {
     let before = this.atoms.get(pos - 1);
     let after = this.atoms.get(pos);
     let id = this.identGenerator.getIdent(this.name, ++this.time, (before && before.id), (after && after.id));
-    let op = new InsertOp(this.name, this.getWallTime(), id, value);
+    let op = new InsertOp(this.name, this.timestampFn(), id, value);
     this.apply(op);
 
     return op;
@@ -109,7 +116,7 @@ export class KSeq<T> {
 
     const atom = this.atoms.get(pos);
     if (atom) {
-      const op = new RemoveOp(this.name, this.getWallTime(), atom.id);
+      const op = new RemoveOp(this.name, this.timestampFn(), atom.id);
       this.apply(op);
       return op;
     }
@@ -194,12 +201,12 @@ export class KSeq<T> {
     }
   }
 
-  /**
-   * Gets the current wall time as a UNIX epoch timestamp.
-   * @returns An integer representing the wall time.
-   */
-  private getWallTime(): number {
-    return Math.floor(new Date().valueOf() / 1000);
-  }
+}
 
+/**
+ * Gets the current wall time as a UNIX epoch timestamp.
+ * @returns An integer representing the wall time.
+ */
+function unixTime() {
+  return Math.floor(new Date().valueOf() / 1000);
 }
