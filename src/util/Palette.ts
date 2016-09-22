@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import { shuffle } from './Random';
 
 export interface PaletteColor {
     id: string;
@@ -30,11 +30,11 @@ export const PRIMARY = {
 
 export const PRIMARY_COLOR = 'GREEN';
 
-export const COLOR_NAMES: string[] = _.keys(PRIMARY);
+export const COLOR_NAMES: string[] = Object.keys(PRIMARY);
 
-export const SHUFFLED_COLOR_NAMES: string[] = _.shuffle(COLOR_NAMES);
+export const SHUFFLED_COLOR_NAMES: string[] = shuffle(COLOR_NAMES);
 
-export const SHUFFLED_PRIMARY_FIRST: string[] = _.concat([PRIMARY_COLOR], _.without(SHUFFLED_COLOR_NAMES, PRIMARY_COLOR));
+export const SHUFFLED_PRIMARY_FIRST: string[] = [ PRIMARY_COLOR ].concat(SHUFFLED_COLOR_NAMES.filter(c => c !== PRIMARY_COLOR));
 
 export const NUM_COLORS: number = COLOR_NAMES.length;
 
@@ -70,16 +70,3 @@ function getSheet(): CSSStyleSheet {
     paletteSheet = styleElem.sheet as CSSStyleSheet;
     return paletteSheet;
 }
-
-// const addStyleRule = (function () {
-//     const added = {};
-//     const styleElement = document.createElement('style');
-//     document.documentElement.getElementsByTagName('head')[0].appendChild(styleElement);
-//     const styleSheet = styleElement.sheet as CSSStyleSheet;
-
-//     return function (css) {
-//         if (added[css]) { return; }
-//         added[css] = true;
-//         styleSheet.insertRule(css, (styleSheet.cssRules || styleSheet.rules).length);
-//     };
-// } ());

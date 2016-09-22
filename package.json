@@ -32,7 +32,6 @@
     "codemirror": "^5.16.0",
     "core-js": "^2.4.0",
     "detect-pitch": "^1.1.0",
-    "lodash": "^4.14.1",
     "lz-string": "^1.4.4",
     "node-uuid": "^1.4.7",
     "pitch-shift": "0.0.0",

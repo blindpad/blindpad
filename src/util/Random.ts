@@ -1,4 +1,25 @@
 /**
+ * Return a shuffled version of the given array
+ */
+export function shuffle<T>(arr: Array<T>): Array<T> {
+    const result = Array.from(arr);
+    for (let i = 0, l = result.length; i < l; i++) {
+        const rand = randomInt(i, l);
+        const t = result[rand];
+        result[rand] = result[i];
+        result[i] = t;
+    }
+    return result;
+}
+
+/**
+ * Get a random integer in the range [lo, hi)
+ */
+export function randomInt(lo: number, hi: number) {
+    return Math.floor(lo + Math.random() * (hi - lo));
+}
+
+/**
  * A basic PRNG that can be seeded (unlike the builtin js one)
  * 
  * A simplified typescripty version of

@@ -1,7 +1,6 @@
 import { Component, ElementRef, OnInit, ViewEncapsulation, OnDestroy, OnChanges, Input } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { Observer } from 'rxjs/Observer';
-import * as _ from 'lodash';
 
 import {
     buildEditor,
@@ -224,7 +223,8 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
         const users = this.pad.getAllUsers();
 
         this.editor.operation(() => {
-            _.each(cursors, (cursor, id) => {
+            Object.keys(cursors || {}).forEach(id => {
+                const cursor = cursors[id];
                 const user = users.get(id);
                 const color = user ? user.getColor().value : PRIMARY.GREY;
                 const start = cursor ? Math.min(cursor.startIndex, cursor.endIndex) : null;
@@ -265,7 +265,8 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
         if (this.isDemoMode || this.applyingRemoteChanges || !this.localCursors) return;
         const localCursor = this.getLocalCursor();
         const update: CursorMap = {};
-        _.each(this.getRemoteCursors(), (cursor, id) => update[id] = cursor);
+        const remote = this.getRemoteCursors();
+        Object.keys(remote || {}).forEach(id => update[id] = remote[id]);
         update[this.localUserId] = localCursor;
         this.localCursors.next(update);
     };

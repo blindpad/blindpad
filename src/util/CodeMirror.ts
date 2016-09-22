@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 import * as CodeMirror from 'codemirror';
 require('../../node_modules/codemirror/lib/codemirror.css');
 
@@ -142,7 +140,7 @@ function filterModes(modes: EditorMode[]): EditorMode[] {
             result.push(mode);
         }
     });
-    return _.sortBy(result, m => m.name);
+    return result.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 function indexModes(modes: EditorMode[], soFar: { [key: string]: EditorMode } = {}): { [key: string]: EditorMode } {

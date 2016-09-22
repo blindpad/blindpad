@@ -1,7 +1,5 @@
 import uuid = require('node-uuid');
 import io = require('socket.io-client');
-// import jsdiff = require('diff');
-import * as _ from 'lodash';
 import { Subject } from 'rxjs/Subject';
 import { Observer } from 'rxjs/Observer';
 import { Observable } from 'rxjs/Observable';
@@ -23,6 +21,7 @@ import { compressOpSet, decompressOpSet } from '../util/Compress';
 import { diffStrings, DIFF_DELETE, DIFF_INSERT } from '../util/Diff';
 import { interval } from '../util/Observables';
 import { SeededRandom } from '../util/Random';
+import { debounce } from '../util/Debounce';
 
 /**
  * After how many milliseconds without an edit can we trigger a pad compaction (assuming all other conditions are met?)
@@ -327,7 +326,8 @@ export class PadModel {
 
         if (update.cursors !== undefined) {
             const newCursors: CursorMap = {};
-            _.each(update.cursors, (cursor, userId) => {
+            Object.keys(update.cursors || {}).forEach(userId => {
+                const cursor = update.cursors[userId];
                 // ignore the cursor if they're not alive
                 if (!this.activeUsers.has(userId)) return;
                 // ignore ours (this is only for remote cursors: we trust ourselves to know our own cursor)
@@ -396,7 +396,7 @@ export class PadModel {
 
         if (!this.debouncedPadUpdate) {
             const delay = 25 * Math.pow(Math.log10(this.opSet.size + 1), 2);
-            this.debouncedPadUpdate = _.debounce(() => {
+            this.debouncedPadUpdate = debounce(() => {
                 this.sendUpdateNow(this.debouncedIsLightweight);
                 this.debouncedPadUpdate = null;
                 this.debouncedIsLightweight = true;
@@ -417,7 +417,7 @@ export class PadModel {
         // we have an opset
         if (this.opSet.size === 0) return;
         // we're the largest client id in the swarm (kind of a janky master)
-        if (this.clientId !== _.max(Array.from(this.activePeers))) return;
+        if (!this.isLargestPeer()) return;
         // we're either by ourself or we have at least one responsive peer (i.e. we're not totally isolated from the swarm)
         if (this.activePeers.size > 1 && this.getResponsivePeers().length === 0) return;
         // it's been more than a certain fixed amount of time since the last pad edit
@@ -455,6 +455,10 @@ export class PadModel {
 
     private getUnresponsivePeers(): Array<UserModel> {
         return Array.from(this.activeUsers.values()).filter(user => user.isRemoteUser() && user.isUnresponsive());
+    }
+
+    private isLargestPeer(): boolean {
+        return this.clientId !== Array.from(this.activePeers).reduce((prev, cur) => cur > prev ? cur : prev);
     }
 
     private killUsersAndSignal(peerIds: Array<string>) {
