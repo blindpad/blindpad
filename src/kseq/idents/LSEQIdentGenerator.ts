@@ -24,11 +24,9 @@ enum LSEQStrategy {
  */
 export class LSEQIdentGenerator implements IdentGenerator {
 
-  startingWidth: number;
-  maxDistance: number;
-  strategies: LSEQStrategy[];
-  first: Ident;
-  last: Ident;
+  private strategies: LSEQStrategy[];
+  private first: Ident;
+  private last: Ident;
 
   /**
    * Creates an instance of LSEQIdentGenerator.
@@ -36,9 +34,7 @@ export class LSEQIdentGenerator implements IdentGenerator {
    * @param maxDistance   The maximum delta between two Idents.
    * @returns An instance of LSEQIdentGenerator.
    */
-  constructor(startingWidth: number = 4, maxDistance: number = 10) {
-    this.startingWidth = startingWidth;
-    this.maxDistance = maxDistance;
+  constructor(private random = Math.random, private startingWidth: number = 4, private maxDistance: number = 10) {
     this.strategies = [];
   }
 
@@ -65,7 +61,7 @@ export class LSEQIdentGenerator implements IdentGenerator {
     }
 
     let boundary = Math.min(distance, this.maxDistance);
-    let delta = Math.floor(Math.random() * boundary) + 1;
+    let delta = Math.floor(this.random() * boundary) + 1;
     let strategy = this.getStrategyAtDepth(depth);
 
     let path: Segment[] = [];
@@ -104,7 +100,7 @@ export class LSEQIdentGenerator implements IdentGenerator {
   private getStrategyAtDepth(depth: number): LSEQStrategy {
     let strategy = this.strategies[depth];
     if (!strategy) {
-      let random = Math.floor(Math.random() * 2) + 1;
+      let random = Math.floor(this.random() * 2) + 1;
       strategy = this.strategies[depth] = <LSEQStrategy> random;
     }
     return strategy;
