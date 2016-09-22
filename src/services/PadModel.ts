@@ -291,7 +291,6 @@ export class PadModel {
             newOps.forEach(op => this.opSet.add(op.toString()));
             this.memoizedOpSetStr = null; // clear a saved value since we changed the canonical one
             this.firePadUpdate(false);
-            console.error(`local ops: v${this.baseVersion}, "${this.doc.toArray().join('')}"`, this.opSet);
         }
     };
 
@@ -314,12 +313,16 @@ export class PadModel {
                 this.applyOpsAndRender(opsToApply);
             } else if (update.baseVersion > this.baseVersion) {
                 // remote is newer, blow ours away
-                this.log(`Overwriting local doc: remote version is ${update.baseVersion} and we are ${this.baseVersion}`);
                 this.setBaseDoc(update.base, update.baseVersion);
                 this.applyOpsAndRender(decompressOpSet(update.opSetStr));
+            } else if (this.baseVersion === update.baseVersion && this.base !== update.base) {
+                // we must've had a split compaction (two people thought they were the master and advanced)
+                if (update.srcId > this.clientId) {
+                    // accept the bigger client's view of reality
+                    this.setBaseDoc(update.base, update.baseVersion);
+                    this.applyOpsAndRender(decompressOpSet(update.opSetStr));
+                }
             }
-            console.error(`updated to: v${this.baseVersion}, "${this.doc.toArray().join('')}"`, this.opSet);
-            // TODO: still the case where we have the same version but different bases: maybe the older client should win?
         }
 
         if (update.cursors !== undefined) {
@@ -422,7 +425,6 @@ export class PadModel {
 
         this.setBaseDoc(this.doc.toArray().join(''), this.baseVersion + 1);
         this.sendUpdateNow(false);
-        console.error(`master:compaction v${this.baseVersion} "${this.base}"`);
     };
 
     private onPeerTimeoutTick = () => {
@@ -475,7 +477,6 @@ export class PadModel {
         // for correctness our "base" text" just implies a set of operations
         // that all peers agree on (in this case made by a simulated third party)
         const rng = new SeededRandom(version);
-        console.error(rng.random(), rng.random(), rng.random());
         const baseDoc = new KSeq<string>('' + version, () => version, () => rng.random());
         for (let i = 0, l = base.length; i < l; i++) {
             this.doc.apply(baseDoc.insert(base.charAt(i), i));
@@ -495,7 +496,6 @@ export class PadModel {
             add.text = this.base;
             this.remoteEdits.next([remove, add]);
         }
-        console.error(`base now v${this.baseVersion}: "${this.base}"`);
     }
 
     private signalRequest = (req: ConnectionRequest) => {
