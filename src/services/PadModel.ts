@@ -75,7 +75,6 @@ export class PadModel {
         this.users = new Map<string, UserModel>();
 
         this.mimeType = new BehaviorSubject(null);
-        this.setBaseDoc('', 0);
         this.mostRecentCursors = null;
 
         this.outgoingUserBroadcasts = new Subject<Message>();
@@ -92,6 +91,7 @@ export class PadModel {
 
         this.activePeers.add(this.clientId);
         this.updateUsers([], []);
+        this.setBaseDoc('', 0);
     }
 
     getPadId(): string { return this.padId; }
@@ -290,6 +290,7 @@ export class PadModel {
             newOps.forEach(op => this.opSet.add(op.toString()));
             this.memoizedOpSetStr = null; // clear a saved value since we changed the canonical one
             this.firePadUpdate(false);
+            console.error('local ops happened: ', this.opSet, this.base, this.doc.toArray().join(''), this.baseVersion);
         }
     };
 
@@ -316,6 +317,7 @@ export class PadModel {
                 this.setBaseDoc(update.base, update.baseVersion);
                 this.applyOpsAndRender(decompressOpSet(update.opSetStr));
             }
+            console.error('update applied: ', this.opSet, this.base, this.doc.toArray().join(''), this.baseVersion);
             // TODO: still the case where we have the same version but different bases: maybe the older client should win?
         }
 
@@ -418,7 +420,7 @@ export class PadModel {
 
         this.setBaseDoc(this.doc.toArray().join(''), this.baseVersion + 1);
         this.sendUpdateNow(false);
-        console.error('master compacted!');
+        console.error('we are master and we broadcast a compaction to: ', this.base, this.baseVersion);
     };
 
     private onPeerTimeoutTick = () => {
@@ -462,16 +464,34 @@ export class PadModel {
     }
 
     private setBaseDoc(base: string, version: number) {
+        const oldVersion = this.doc ? this.doc.toArray().join('') : '';
         this.base = base;
         this.baseVersion = version;
         this.doc = new KSeq<string>(this.clientId.substring(0, 6)); // this is probably way too collision-happy
-        for (let i = 0, l = base.length; i < l; i++) {
-            this.doc.insert(base.charAt(i), i);
-        }
         this.opSet = new Set<string>();
+
+        // for correctness our "base" text" just implies a set of operations
+        // that all peers agree on (in this case made by a simulated third party)
+        const baseDoc = new KSeq<string>('' + version);
+        for (let i = 0, l = base.length; i < l; i++) {
+            this.doc.apply(baseDoc.insert(base.charAt(i), i));
+        }
         this.memoizedOpSetStr = null;
         this.lastEditTime = Date.now();
-        console.error('base: ', this.base, this.baseVersion, this.opSet, this.doc.toArray());
+
+        // if post-compaction the doc has changed flush the new version of the doc as remove+insert edits
+        if (oldVersion !== this.base) {
+            const remove = new PadEdit();
+            remove.index = 0;
+            remove.isInsert = false;
+            remove.text = oldVersion;
+            const add = new PadEdit();
+            add.index = 0;
+            add.isInsert = true;
+            add.text = this.base;
+            this.remoteEdits.next([remove, add]);
+        }
+        console.error('base is now: ', this.base, this.baseVersion, this.opSet, this.doc.toArray().join(''));
     }
 
     private signalRequest = (req: ConnectionRequest) => {
