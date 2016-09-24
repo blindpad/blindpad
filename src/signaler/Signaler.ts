@@ -24,7 +24,7 @@ class Signaler {
     private host: string;
 
     private useDebug = false;
-    private useLog = false;
+    private useLog = true;
 
     private numSockets = 0;
     private numPadsMemo: number = null; // memoized
