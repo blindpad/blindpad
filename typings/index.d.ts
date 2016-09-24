@@ -8,5 +8,7 @@
 /// <reference path="globals/webaudioapi/waa/index.d.ts" />
 /// <reference path="globals/webrtc/mediastream/index.d.ts" />
 /// <reference path="globals/webrtc/rtcpeerconnection/index.d.ts" />
+/// <reference path="modules/basic-auth/index.d.ts" />
+/// <reference path="modules/express/index.d.ts" />
 /// <reference path="modules/lodash/index.d.ts" />
 /// <reference path="modules/node-uuid/index.d.ts" />

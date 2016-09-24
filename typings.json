@@ -12,6 +12,8 @@
     "webrtc/rtcpeerconnection": "registry:dt/webrtc/rtcpeerconnection#0.0.0+20160719235950"
   },
   "dependencies": {
+    "basic-auth": "registry:npm/basic-auth#1.0.4+20160811001003",
+    "express": "registry:npm/express#4.14.0+20160922175659",
     "lodash": "registry:npm/lodash#4.0.0+20160723033700",
     "node-uuid": "registry:npm/node-uuid#1.4.7+20160723033700"
   }

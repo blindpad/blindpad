@@ -72,4 +72,4 @@ npm run prod
 npm run test
 ```
 
-See `Protocol.ts` for configuring your installation: it holds all of the options you'll need to setup a signaler and point a frontend at it.  If anything isn't clear please file an issue.
+See `Protocol.ts` and `Config.ts` for configuring your installation: they hold all of the options you'll need to setup a signaler and point a frontend at it.  If anything isn't clear please file an issue.

@@ -1,0 +1,11 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/types/npm-basic-auth/6ef4a98dcf8933836878cc45171b154cfe36e00e/typings.json",
+    "raw": "registry:npm/basic-auth#1.0.4+20160811001003",
+    "main": "index.d.ts",
+    "version": "1.0.4",
+    "name": "basic-auth",
+    "type": "typings"
+  }
+}
