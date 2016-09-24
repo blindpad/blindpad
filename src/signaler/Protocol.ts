@@ -277,11 +277,13 @@ export function getSignalerURI(): string {
 }
 
 export function getSignalerHost(): string {
-    return process.env.NODE_IP || USE_LOCAL_SIGNALER ? '127.0.0.1' : REMOTE_SIGNALER_HOST;
+    if (process.env.NODE_IP) return process.env.NODE_IP;
+    return USE_LOCAL_SIGNALER ? '127.0.0.1' : REMOTE_SIGNALER_HOST;
 }
 
 export function getSignalerPort(): number {
-    return process.env.NODE_PORT || USE_LOCAL_SIGNALER ? 3000 : REMOTE_SIGNALER_PORT;
+    if (process.env.NODE_PORT) return process.env.NODE_PORT;
+    return USE_LOCAL_SIGNALER ? 3000 : REMOTE_SIGNALER_PORT;
 }
 
 export function getSignalerProtocol(): string {

@@ -151,5 +151,8 @@ function auth(username: string, password: string) {
 };
 
 if (require.main === module) {
-    new Signaler().start(getSignalerPort(), getSignalerHost());
+    const port = getSignalerPort();
+    const host = getSignalerHost();
+    console.log(`Attempting to start bp-signaler on "${host}" port ${port}`); // tslint:disable-line
+    new Signaler().start(port, host);
 }
