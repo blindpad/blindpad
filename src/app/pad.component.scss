@@ -38,6 +38,10 @@
         opacity: 0;
       }
 
+      & > pad-body > pad-toolbar {
+        opacity: 0;
+      }
+
       &:after {
         content: "";
         position: absolute;
@@ -137,6 +141,12 @@
         max-width: 200px;
         min-width: 60px;
         flex: 1 1;
+
+        pad-status {
+          display: block;
+          padding-left: 6px;
+          padding-bottom: 16px;
+        }
       }
 
       editor {

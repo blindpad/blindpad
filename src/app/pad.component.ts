@@ -149,6 +149,8 @@ export class PadComponent implements OnInit, OnDestroy {
         this.view = PadView.AudioSetup;
     }
 
+    isConnected(): boolean { return this.hasPad() && this.getPad().isSignalerConnected(); }
+
     getUsers(): UserModel[] {
         if (!this.hasPad()) return [];
         return Array.from(this.getPad().getUsers().values());

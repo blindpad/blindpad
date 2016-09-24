@@ -101,6 +101,7 @@ export class PadModel {
     getAllUsers(): Map<string, UserModel> { return this.users; }
     log(...msg: any[]) { if (this.useLog) console.log('', ...msg); } // tslint:disable-line
 
+    isSignalerConnected(): boolean { return this.signaler && this.signaler.connected; }
     getOutoingUserBroadcasts(): Observable<Message> { return this.outgoingUserBroadcasts; }
     getLocalEdits(): Observer<PadEdit[]> { return this.localEdits; }
     getRemoteEdits(): Observable<PadEdit[]> { return this.remoteEdits; }

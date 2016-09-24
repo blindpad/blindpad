@@ -149,6 +149,7 @@
     </pad-header>
     <pad-body>
         <pad-toolbar>
+            <pad-status *ngIf="!isConnected()">Looking for others...</pad-status>
             <pad-users>
                 <user *ngFor="let user of getUsers()" [model]="user"></user>
             </pad-users>
