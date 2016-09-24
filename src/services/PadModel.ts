@@ -136,6 +136,7 @@ export class PadModel {
         this.log('Looking for signaler: ', signalerURI);
         this.signaler = io.connect(signalerURI);
         this.remoteEdits.next([]); // kind of a hack, tells the editor that we're starting
+        this.setMimeType(null);
 
         this.signaler.on('connect', () => {
             this.log('Connected to signaler, asking for peers!');

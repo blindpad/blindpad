@@ -162,6 +162,7 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
         } else {
             this.autoEditor.stop();
             this.editor.setValue('');
+            this.setMode(getModeForMime(null));
             this.isDemoMode = false;
         }
     }
