@@ -72,4 +72,19 @@ npm run prod
 npm run test
 ```
 
-See `Protocol.ts` and `Config.ts` for configuring your installation: they hold all of the options you'll need to setup a signaler and point a frontend at it.  If anything isn't clear please file an issue.
+See `Protocol.ts` and `Auth.ts` for configuring your installation: they hold all of the options you'll need to setup a signaler and point a frontend at it.  If anything isn't clear please file an issue.
+
+## Roadmap
+- [ ] Better hosting for the public version.
+- [ ] Investigate improved robustness and flood protection on the signaler.
+- [ ] Recovery after network outage: restart the pad if the user detects that the swarm has timed them out. (Or gray-out the screen and prompt the user to refresh).
+- [ ] Listen for dead audio, show an alert about the Chrome + Mac bug and prompt the user to refresh.
+- [ ] Audit for accessibility / screenreader support.
+- [ ] Translation into other languages.
+- [ ] Undo doesn't work as most users would expect (you can undo remote changes).  Possible solution with Codemirror is linked documents (where each remote user object symbolically has their own).  See [here](http://marijnhaverbeke.nl/blog/codemirror-shared-documents.html).
+
+### Long-term ideas
+- [ ] Drop resource files to share in the workspace.
+- [ ] Run certain languages in the browser via emscripten ports (where available).
+- [ ] Some form of more advanced voice anonymization (more subtle gender quirks?, non-native accent modulation?).
+- [ ] Anonymizing video chat (using some sort of mo-cap or masking?).
