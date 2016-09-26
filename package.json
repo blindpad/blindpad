@@ -15,8 +15,8 @@
     "dev-signaler": "webpack --progress --colors && node dist/server.js",
     "prod": "PROD_ENV=1 npm run build",
     "prod-app": "PROD_ENV=1 npm run dev-app",
-    "deploy-signaler": "npm run clean && npm run prod && rm -f ../bpsignaler/server.js && cp ./dist/server.js ../bpsignaler/server.js && cd ../bpsignaler && git commit -am deployed && git push origin master",
-    "deploy-public": "npm run clean && npm run prod && rm -rf ../blindpad.github.io/* && cp -r ./dist/* ../blindpad.github.io/ && cd ../blindpad.github.io && git add --all && git commit -am deployed && git push origin master",
+    "deploy-signaler": "npm run clean && npm run prod && rm -f ../bpsignaler/server.js && cp ./dist/server.js ../bpsignaler/server.js && cd ../bpsignaler && git commit --allow-empty -am deployed && git push origin master",
+    "deploy-public": "npm run clean && npm run prod && rm -rf ../blindpad.github.io/* && cp -r ./dist/* ../blindpad.github.io/ && cd ../blindpad.github.io && git add --all && git commit --allow-empty -am deployed && git push origin master",
     "test": "karma start"
   },
   "dependencies": {
