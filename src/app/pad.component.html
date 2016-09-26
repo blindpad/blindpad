@@ -15,11 +15,11 @@
             <p class="reconfigure-prompt" *ngIf="media.isCalibrated()"><button (click)="media.clearCalibration()" class="text invert inline">You're all set. Click here if you want to reset your audio settings.</button></p>
         </div>
         <p *ngIf="!hasWebRTC()" class="error">
-            It looks like your browser doesn't currently support WebRTC. <a href="https://webrtc.org/">Click here</a> for
+            It looks like your browser doesn't fully support WebRTC. <a href="https://webrtc.org/">Click here</a> for
             a list of compatible browsers.
         </p>
         <p *ngIf="!hasWebAudio()" class="error">
-            It looks like your browser doesn't currently support WebAudio. <a href="http://caniuse.com/#feat=audio-api">Click here</a>            for a list of compatible browsers.
+            It looks like your browser doesn't fully support WebAudio. <a href="http://caniuse.com/#feat=audio-api">Click here</a>            for a list of compatible browsers.
         </p>
     </modal-body>
 </welcome-modal>

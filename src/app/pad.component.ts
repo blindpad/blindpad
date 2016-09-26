@@ -76,8 +76,16 @@ export class PadComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() { this.routeSub.unsubscribe(); }
 
-    hasWebRTC() { return !!window.RTCPeerConnection && !!window.navigator && !!window.navigator.getUserMedia; }
-    hasWebAudio() { return !!window.AudioContext || !!window['webkitAudioContext']; }
+    hasWebRTC(): boolean {
+        return hasMethod(window.RTCPeerConnection || window['webkitRTCPeerConnection'], 'createDataChannel')
+            && hasMethod(window.navigator, 'getUserMedia');
+
+    }
+
+    hasWebAudio(): boolean {
+        return hasMethod(window.AudioContext || window['webkitAudioContext'], 'createMediaStreamDestination');
+    }
+
     browserIsSupported() { return this.hasWebAudio() && this.hasWebRTC(); }
 
     getView(): PadView { return this.view; }
@@ -170,4 +178,8 @@ export class PadComponent implements OnInit, OnDestroy {
         }
     }
 
+}
+
+function hasMethod(type: any, methodName: string): boolean {
+    return type && (type[methodName] || (type['prototype'] && type['prototype'][methodName]));
 }

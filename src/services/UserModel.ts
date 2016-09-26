@@ -231,7 +231,6 @@ export class UserModel {
             this.sendHeartbeatResponse();
         });
         this.getMessagesIn(UserStatusResponse.messageType).subscribe((response: UserStatusResponse) => {
-            console.error('heartbeat response!');
             if (this.name.value !== response.name) {
                 this.pad.log('Received name from ', response.srcId, ' / ', response.name);
                 this.name.next(response.name);
