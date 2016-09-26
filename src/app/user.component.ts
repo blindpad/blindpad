@@ -109,6 +109,12 @@ export class UserComponent implements OnChanges, OnDestroy {
         });
     }
 
+    getTitle(): string {
+        if (!this.connected) return 'Connecting...';
+        if (this.model.isUnavailable()) return 'Currently unavailable';
+        return this.name;
+    }
+
 }
 
 function getInitials(str: string) {

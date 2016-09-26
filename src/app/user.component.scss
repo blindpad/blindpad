@@ -31,7 +31,7 @@ $mute-button-width: 29px;
     }
   }
 
-  .foreground {
+  user-foreground {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -43,6 +43,13 @@ $mute-button-width: 29px;
 
     & > * {
       margin: 0px;
+    }
+
+    &.unavailable {
+      opacity: 0.5;
+      & > user-name {
+        font-style: italic;
+      }
     }
 
     user-icon {

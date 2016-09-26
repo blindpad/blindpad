@@ -43,12 +43,17 @@ const DATA_CHANNEL_MAX_MESSAGE_SIZE = 60000; // the internet says not to go over
 /**
  * How often should we send proactive heartbeats to another user?
  */
-const HEARTBEAT_FREQUENCY_MS = 5000;
+const HEARTBEAT_FREQUENCY_MS = 3000;
 
 /**
- * Any user who hasn't responded within this amount of time is considered fair game to be timed out
+ * After how long since our last message should we indicate to the user that this peer is out of contact / unavailable?
  */
-const USER_TIMEOUT = 3.5 * HEARTBEAT_FREQUENCY_MS;
+const PEER_UNAVAILABLE_MS = 2.2 * HEARTBEAT_FREQUENCY_MS;
+
+/**
+ * Any user who hasn't responded within this amount of time is considered fair game to be timed out and killed from the swarm
+ */
+const PEER_TIMEOUT_MS = 25000;
 
 export class UserModel {
 
@@ -107,7 +112,9 @@ export class UserModel {
     isRemoteUser(): boolean { return !this.isLocalUser(); }
     isClosed(): boolean { return this.closed; }
     isStarted(): boolean { return this.started; }
-    isUnresponsive(): boolean { return this.isRemoteUser() && Date.now() - this.lastMessageTime > USER_TIMEOUT; }
+
+    isUnavailable(): boolean { return this.isRemoteUser() && Date.now() - this.lastMessageTime > PEER_UNAVAILABLE_MS; }
+    isTimedOut(): boolean { return this.isRemoteUser() && Date.now() - this.lastMessageTime > PEER_TIMEOUT_MS; }
 
     getAudioStream(): BehaviorSubject<MediaStream> { return this.audioStream; }
     getIsMuted() { return this.isMuted; }
@@ -224,6 +231,7 @@ export class UserModel {
             this.sendHeartbeatResponse();
         });
         this.getMessagesIn(UserStatusResponse.messageType).subscribe((response: UserStatusResponse) => {
+            console.error('heartbeat response!');
             if (this.name.value !== response.name) {
                 this.pad.log('Received name from ', response.srcId, ' / ', response.name);
                 this.name.next(response.name);

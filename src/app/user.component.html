@@ -1,6 +1,6 @@
 <audio #audio autoplay></audio>
 <audio-monitor [analyser]="model.getVoiceAnalyser()"></audio-monitor>
-<div class="foreground">
+<user-foreground [class.unavailable]="model.isUnavailable()" [title]="getTitle()">
     <user-icon [class.local-user]="model.isLocalUser()" [class.dark-text]="color.darkText" [style.background-color]="connected ? color.val : 'transparent'">
         {{initials}}
         <div class="spinner" *ngIf="!connected">
@@ -8,8 +8,8 @@
             <div class="double-bounce2"></div>
         </div>
     </user-icon>
-    <user-name [title]="connected ? name : 'Connecting...'">
+    <user-name>
         {{ connected ? name : 'Connecting...' }}
     </user-name>
     <button *ngIf="connected" title="Mute" class="mute-button text" [class.muted]="model.getIsMuted().value" [class.voice-active]="voiceIsActive" [class.local-user]="model.isLocalUser()" (click)="model.setMuted()"></button>
-</div>
+</user-foreground>

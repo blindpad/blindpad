@@ -28,7 +28,7 @@ import { debounce } from '../util/Debounce';
  */
 const COMPACTION_DELAY_MS = 4000;
 
-const PEER_TIMEOUT_POLL_MS = 20000;
+const PEER_TIMEOUT_POLL_MS = 5000;
 const COMPACTION_POLL_MS = 1000;
 
 export class PadModel {
@@ -430,21 +430,21 @@ export class PadModel {
     };
 
     private onPeerTimeoutTick = () => {
-        // conditions under which we should broadcast time-out / unresponsive peers as dead
+        // conditions under which we should broadcast timed out peers as dead
         // we're not dead
         if (!this.activePeers.has(this.clientId)) return;
         // we have peers
         if (this.activePeers.size < 2) return;
-        // at least one of them is unresponsive
-        if (this.getUnresponsivePeers().length === 0) return;
+        // at least one of them is timed out
+        if (this.getTimedOutPeers().length === 0) return;
 
         // we can hit the network (to ensure we're not isolated)
         const req = new XMLHttpRequest();
         req.onreadystatechange = () => {
             if (req.readyState !== XMLHttpRequest.DONE || req.status !== 200) return;
             // we know we're online
-            const unresponsiveIds = this.getUnresponsivePeers().map(user => user.getId());
-            if (unresponsiveIds.length > 0) this.killUsersAndSignal(unresponsiveIds);
+            const timedOutIds = this.getTimedOutPeers().map(user => user.getId());
+            if (timedOutIds.length > 0) this.killUsersAndSignal(timedOutIds);
         };
         req.timeout = PEER_TIMEOUT_POLL_MS / 2;
         req.open('GET', `/index.html?t=${Date.now()}`, true); // prevent caching
@@ -452,11 +452,11 @@ export class PadModel {
     }
 
     private getResponsivePeers(): Array<UserModel> {
-        return Array.from(this.activeUsers.values()).filter(user => user.isRemoteUser() && !user.isUnresponsive());
+        return Array.from(this.activeUsers.values()).filter(user => user.isRemoteUser() && !user.isUnavailable());
     }
 
-    private getUnresponsivePeers(): Array<UserModel> {
-        return Array.from(this.activeUsers.values()).filter(user => user.isRemoteUser() && user.isUnresponsive());
+    private getTimedOutPeers(): Array<UserModel> {
+        return Array.from(this.activeUsers.values()).filter(user => user.isRemoteUser() && user.isTimedOut());
     }
 
     private isLargestPeer(): boolean {
