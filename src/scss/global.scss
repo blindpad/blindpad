@@ -126,7 +126,11 @@ a:visited {
 }
 
 span.cm-def {
-  color: white !important; //$color-primary-light !important;
+  color: white !important; 
+}
+
+.CodeMirror, .CodeMirror-gutters, .CodeMirror-gutter-background {
+  background: $color-editor !important;
 }
 
 // span.cm-keyword {

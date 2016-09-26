@@ -1,17 +1,18 @@
-$color-primary-dark:   #388E3C;
-$color-primary:        #4CAF50;
-$color-primary-light:  #C8E6C9;
+$color-primary:        #2196F3;
+$color-primary-dark:   darken($color-primary, 20%);
+$color-primary-light:  lighten($color-primary, 20%);
 $color-primary-text:   #FFFFFF;
-$color-accent:         #03A9F4;
+$color-accent:         #00BCD4;
 $color-primary-text:   #FEFEFE;
 $color-secondary-text: #CACACA;
 
 $color-disabled:       transparentize(#BDBDBD, 0.8);
-$color-warning:        #FFEB3B;
+$color-warning:        $color-primary;
 $color-error:          #F44336;
 
-$color-editor:         #272822;
+$color-editor:         #1E1E1E;
 $color-background:     black;
+$color-header:         $color-background;
 $color-divider:        #2E2F2A;
 $color-overlay:        fade-out($color-background, 0.5);
 

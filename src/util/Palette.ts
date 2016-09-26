@@ -28,7 +28,7 @@ export const PRIMARY = {
     BLUE_GREY:      { id: 'BLUE_GREY',   val: '#607D8B', darkText: false } as PaletteColor
 };
 
-export const PRIMARY_COLOR = 'GREEN';
+export const PRIMARY_COLOR = 'BLUE';
 
 export const COLOR_NAMES: string[] = Object.keys(PRIMARY);
 
