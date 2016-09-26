@@ -44,7 +44,7 @@
     "typedarray-pool": "^1.1.0",
     "web-animations-js": "^2.2.2",
     "webrtc-adapter": "^2.0.2",
-    "zone.js": "0.6.21"
+    "zone.js": "0.6.25"
   },
   "devDependencies": {
     "angular2-template-loader": "^0.5.0",
