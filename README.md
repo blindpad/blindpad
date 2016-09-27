@@ -79,6 +79,7 @@ See `Protocol.ts` and `Auth.ts` for configuring your installation: they hold all
 
 ## Roadmap
 - [ ] Better hosting for the public version.
+- [ ] Standard in-app textual chat / messaging.
 - [ ] Investigate improved robustness and flood protection on the signaler.
 - [ ] Recovery after network outage: restart the pad if the user detects that the swarm has timed them out. (Or gray-out the screen and prompt the user to refresh).
 - [ ] Listen for dead audio, show an alert about the Chrome + Mac bug and prompt the user to refresh.
