@@ -10,7 +10,8 @@ export const EXAMPLES: {text: string, mode: EditorMode}[] = [
 
     {
         mode: JAVASCRIPT,
-        text: `\n\n\n\n\nfunction eratosthenes(n) {
+        text: `\n\n\n\n
+function eratosthenes(n) {
     // Eratosthenes algorithm to find all primes under n
     var array = [], upperLimit = Math.sqrt(n), output = [];
 
@@ -40,7 +41,8 @@ export const EXAMPLES: {text: string, mode: EditorMode}[] = [
     },
     {
         mode: C,
-        text: `\n\n\n\n\nstatic struct node *prev = NULL;
+        text: `\n\n\n\n
+static struct node *prev = NULL;
 
 bool isBST(struct node* root)
 {
@@ -64,33 +66,35 @@ bool isBST(struct node* root)
     },
     {
         mode: PYTHON,
-        text: `\n\n\n\n\nfrom bitarray import bitarray
+        text: `\n\n\n\n
+from bitarray import bitarray
 import mmh3
  
 class BloomFilter:
     
-    def __init__(self, size, hash_count):
+    def __init__(self, size, num_hashes = 10):
         self.size = size
-        self.hash_count = hash_count
+        self.num_hashes = num_hashes
         self.bit_array = bitarray(size)
         self.bit_array.setall(0)
         
     def add(self, string):
-        for seed in xrange(self.hash_count):
+        for seed in xrange(self.num_hashes):
             result = mmh3.hash(string, seed) % self.size
             self.bit_array[result] = 1
             
-    def lookup(self, string):
-        for seed in xrange(self.hash_count):
+    def might_have(self, string):
+        for seed in xrange(self.num_hashes):
             result = mmh3.hash(string, seed) % self.size
             if self.bit_array[result] == 0:
-                return "Nope"
-        return "Probably"
+                return False
+        return True
 `
     },
     {
         mode: RUST,
-        text: `\n\n\n\n\nfn fib(x: int) -> int {
+        text: `\n\n\n\n
+fn fib(x: int) -> int {
     match x {
         0 | 1 => x,
         _     => fib(x - 1) + fib(x - 2),
