@@ -11,6 +11,7 @@ require('../../node_modules/codemirror/mode/coffeescript/coffeescript.js');
 require('../../node_modules/codemirror/mode/css/css.js');
 require('../../node_modules/codemirror/mode/dockerfile/dockerfile.js');
 require('../../node_modules/codemirror/mode/erlang/erlang.js');
+require('../../node_modules/codemirror/mode/elm/elm.js');
 require('../../node_modules/codemirror/mode/go/go.js');
 require('../../node_modules/codemirror/mode/haskell/haskell.js');
 require('../../node_modules/codemirror/mode/htmlmixed/htmlmixed.js');
@@ -92,6 +93,7 @@ export const MODES: EditorMode[] = filterModes([
     },
     { name: 'Dockerfile', mime: 'text/x-dockerfile', children: [] },
     { name: 'Erlang', mime: 'text/x-erlang', children: [] },
+    { name: 'Elm', mime: 'text/x-elm', children: [] },
     { name: 'Go', mime: 'text/x-go', children: [] },
     { name: 'Haskell', mime: 'text/x-haskell', children: [] },
     { name: 'XML', mime: 'application/xml', children: [] },
