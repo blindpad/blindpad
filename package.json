@@ -1,6 +1,6 @@
 {
   "name": "blindpad",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "description": "Blindpad is an open source collaborative text editor (like Google Docs or CoderPad) with integrated semi-anonymizing voice chat intended to help reduce bias in technical communication.",
   "license": "Apache-2.0",
   "repository": {
