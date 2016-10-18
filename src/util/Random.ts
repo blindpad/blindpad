@@ -47,7 +47,7 @@ export class SeededRandom {
      * http://en.wikipedia.org/wiki/Random_number_generation#Computational_methods
      * http://stackoverflow.com/questions/521295/javascript-random-seeds#19301306
      */
-    random(): number {
+    random = () => {
         let mz = this.mz;
         let mw = this.mw;
 
