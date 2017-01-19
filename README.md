@@ -1,6 +1,6 @@
 ![Blindpad](https://raw.githubusercontent.com/blindpad/blindpad/master/src/assets/bp_splash.png)
 
-**The publicly hosted version of Bindpad is available here: [blindpad.github.io](https://blindpad.github.io).**
+**The publicly hosted version of Blindpad is available here: [blindpad.github.io](https://blindpad.github.io).**
 
 
 ## What is Blindpad?
