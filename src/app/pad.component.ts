@@ -12,7 +12,7 @@ import { BlindpadService } from '../services/blindpad.service';
 import { MediaService } from '../services/media.service';
 import { UserModel } from '../services/UserModel';
 import { getDescribedNoun } from '../util/Names';
-import { getModeForMime, EditorMode, MODES } from '../util/CodeMirror';
+import { getModeForMime, EditorMode, MODES, KEYMAPS} from '../util/CodeMirror';
 import { fadeInOut } from '../util/Animations';
 
 enum PadView {
@@ -35,6 +35,7 @@ export class PadComponent implements OnInit, OnDestroy {
 
     PadView = PadView;
     visibleModeChoices: EditorMode[] = null;
+    visibleKeymapChoices: string[] = null;
 
     private routeSub: Subscription;
     private randomPadId: string;
@@ -100,6 +101,19 @@ export class PadComponent implements OnInit, OnDestroy {
         return getModeForMime(pad.getMimeType().value);
     }
 
+    getPadKeymap(): string {
+        const pad = this.getPad();
+        if (!pad) return null;
+        return pad.getKeymap();
+    }
+
+    onKeymapButtonClick() {
+        if (this.visibleKeymapChoices) {
+            this.visibleKeymapChoices = null;
+        } else {
+            this.visibleKeymapChoices = KEYMAPS;
+        }
+    }
     onModeButtonClick() {
         if (this.visibleModeChoices) {
             this.visibleModeChoices = null;
@@ -119,12 +133,23 @@ export class PadComponent implements OnInit, OnDestroy {
         }
     }
 
+    onKeymapChoice(choice: string) {
+        if (!choice || !this.hasPad()) {
+            this.visibleModeChoices = null;
+        } else {
+            this.getPad().setKeymap(choice);
+            this.visibleModeChoices = null;
+        }
+    }
+
     onDocumentClick(event: MouseEvent) {
         if (this.visibleModeChoices === null) return;
         const target = event.target as Element;
         const isModeChoice = target.tagName.toLowerCase() === 'mode-choice';
+        const isKeymapChoice = target.tagName.toLowerCase() === 'keymap-choice';
         const isModeButton = target.classList.contains('mode-button');
-        if (isModeButton || isModeChoice) return;
+        const isKeymapButton = target.classList.contains('keymap-button');
+        if (isModeButton || isModeChoice || isKeymapChoice || isKeymapButton) return;
         this.visibleModeChoices = null;
     }
 

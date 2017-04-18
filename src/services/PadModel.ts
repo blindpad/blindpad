@@ -42,6 +42,7 @@ export class PadModel {
     private activeUsers: Map<string, UserModel>;
 
     private mimeType: BehaviorSubject<string>;
+    private keyMap: string;
     private doc: KSeq<string>;
     private base: string;
     private baseVersion: number;
@@ -75,6 +76,7 @@ export class PadModel {
         this.users = new Map<string, UserModel>();
 
         this.mimeType = new BehaviorSubject(null);
+        this.keyMap = 'vim';
         this.mostRecentCursors = null;
 
         this.outgoingUserBroadcasts = new Subject<Message>();
@@ -110,6 +112,8 @@ export class PadModel {
 
     getMimeType(): BehaviorSubject<string> { return this.mimeType; }
     setMimeType(mime: string) { if (mime !== this.mimeType.value) this.mimeType.next(mime); }
+    getKeymap(): string { return this.keyMap; }
+    setKeymap(keymap: string) { if (keymap !== this.keyMap) this.keyMap = keymap; }
 
     buildPadUpdate(isLightweight = true): PadUpdate {
         const update = new PadUpdate();
@@ -138,6 +142,7 @@ export class PadModel {
         this.signaler = io.connect(signalerURI);
         this.remoteEdits.next([]); // kind of a hack, tells the editor that we're starting
         this.setMimeType(null);
+        this.setKeymap(null);
 
         this.signaler.on('connect', () => {
             this.log('Connected to signaler, asking for peers!');

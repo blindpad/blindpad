@@ -136,6 +136,19 @@
             <a class="invert" href="https://github.com/blindpad/blindpad/issues/new">feedback</a>
             <a class="invert" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VW2QSSP76L36N">donate</a>
             <a class="invert" routerLink="/about">about</a>
+
+
+            <button class="keymap-button" *ngIf="!!getPadKeymap()" (click)="onKeymapButtonClick()">
+                {{ getPadKeymap() }}
+            </button>
+            <keymap-choices [@fadeInOut] *ngIf="visibleKeymapChoices != null">
+                <keymap-choice *ngFor="let keymap of visibleKeymapChoices" (click)="onModeChoice(keymap)" [class.has-children]="keymap.children.length > 0"
+                    [class.is-picked]="keymap == getPadKeymap()">
+                    {{ keymap }}
+                </keymap-choice>
+            </keymap-choices>
+
+
             <button class="mode-button" *ngIf="!!getPadMode()" (click)="onModeButtonClick()">
                 {{ getPadMode().name }}
             </button>
@@ -145,6 +158,9 @@
                     {{ mode.name }}
                 </mode-choice>
             </mode-choices>
+
+
+
         </nav>
     </pad-header>
     <pad-body>

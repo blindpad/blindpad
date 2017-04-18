@@ -163,12 +163,17 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
             this.autoEditor.stop();
             this.editor.setValue('');
             this.setMode(getModeForMime(null));
+            this.setKeymap('vim');
             this.isDemoMode = false;
         }
     }
 
     private setMode = (mode: EditorMode) => {
         this.editor.setOption('mode', mode.mime);
+    }
+
+    private setKeymap = (keyMap: string) => {
+        this.editor.setOption('keyMap', keyMap);
     }
 
     private onRemoteEdits = (edits: PadEdit[]) => {

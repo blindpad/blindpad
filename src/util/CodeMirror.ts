@@ -5,6 +5,10 @@ require('../../node_modules/codemirror/theme/monokai.css');
 
 require('../../node_modules/codemirror/addon/selection/active-line');
 
+require('../../node_modules/codemirror/keymap/vim.js');
+require('../../node_modules/codemirror/keymap/sublime.js');
+require('../../node_modules/codemirror/keymap/emacs.js');
+
 require('../../node_modules/codemirror/mode/clike/clike.js');
 require('../../node_modules/codemirror/mode/clojure/clojure.js');
 require('../../node_modules/codemirror/mode/coffeescript/coffeescript.js');
@@ -37,6 +41,12 @@ export interface EditorMode {
     mime?: string;
     children?: EditorMode[];
 }
+
+export const KEYMAPS: string[] = [
+    'vim',
+    'emacs',
+    'sublime'
+];
 
 export const DEFAULT_MODE: EditorMode = { name: 'Plaintext', mime: 'text/plain', children: [] };
 export const JAVASCRIPT: EditorMode = { name: 'JavaScript', mime: 'application/javascript', children: [] };
@@ -119,7 +129,8 @@ export const DEFAULT_EDITOR_CONFIG = {
     styleActiveLine: true,
     autofocus: true,
     mode: DEFAULT_MODE.mime,
-    viewportMargin: Infinity
+    viewportMargin: Infinity,
+    keyMap: 'vim'
 } as CodeMirror.EditorConfiguration;
 
 export function buildEditor(host: HTMLElement, options = DEFAULT_EDITOR_CONFIG) {
