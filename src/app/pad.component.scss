@@ -94,13 +94,13 @@
         keymap-choices {
           position: absolute;
           top: $header-height;
-          right: 20;
+          right: 100px;
           background-color: $color-overlay;
           max-height: calc(100% - #{$header-height});
           // padding: 8px 0px;
           overflow-y: auto;
           z-index: 1000;
-          min-width: 140px;
+          min-width: 86px;
 
           keymap-choice {
             display: block;

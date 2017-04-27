@@ -22,6 +22,7 @@ import { diffStrings, DIFF_DELETE, DIFF_INSERT } from '../util/Diff';
 import { interval } from '../util/Observables';
 import { SeededRandom } from '../util/Random';
 import { debounce } from '../util/Debounce';
+import { DEFAULT_KEYMAP } from '../util/CodeMirror';
 
 /**
  * After how many milliseconds without an edit can we trigger a pad compaction (assuming all other conditions are met?)
@@ -42,7 +43,7 @@ export class PadModel {
     private activeUsers: Map<string, UserModel>;
 
     private mimeType: BehaviorSubject<string>;
-    private keyMap: string;
+    private keyMap: BehaviorSubject<string>;
     private doc: KSeq<string>;
     private base: string;
     private baseVersion: number;
@@ -76,7 +77,7 @@ export class PadModel {
         this.users = new Map<string, UserModel>();
 
         this.mimeType = new BehaviorSubject(null);
-        this.keyMap = 'vim';
+        this.keyMap = new BehaviorSubject(DEFAULT_KEYMAP);
         this.mostRecentCursors = null;
 
         this.outgoingUserBroadcasts = new Subject<Message>();
@@ -112,8 +113,8 @@ export class PadModel {
 
     getMimeType(): BehaviorSubject<string> { return this.mimeType; }
     setMimeType(mime: string) { if (mime !== this.mimeType.value) this.mimeType.next(mime); }
-    getKeymap(): string { return this.keyMap; }
-    setKeymap(keymap: string) { if (keymap !== this.keyMap) this.keyMap = keymap; }
+    getKeymap(): BehaviorSubject<string> { return this.keyMap; }
+    setKeymap(keymap: string) { if (keymap !== this.keyMap.value) this.keyMap.next(keymap); }
 
     buildPadUpdate(isLightweight = true): PadUpdate {
         const update = new PadUpdate();
@@ -142,7 +143,6 @@ export class PadModel {
         this.signaler = io.connect(signalerURI);
         this.remoteEdits.next([]); // kind of a hack, tells the editor that we're starting
         this.setMimeType(null);
-        this.setKeymap(null);
 
         this.signaler.on('connect', () => {
             this.log('Connected to signaler, asking for peers!');

@@ -2,12 +2,13 @@ import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { PadEdit } from '../signaler/Protocol';
-import { EditorMode, DEFAULT_MODE } from './CodeMirror';
+import { EditorMode, DEFAULT_MODE, DEFAULT_KEYMAP } from './CodeMirror';
 
 export class AutoEditor {
 
     private edits = new Subject<PadEdit>();
     private mode = new BehaviorSubject<EditorMode>(DEFAULT_MODE);
+    private keymap = new BehaviorSubject<string>(DEFAULT_KEYMAP);
 
     private requestId: number = null;
 
@@ -38,6 +39,7 @@ export class AutoEditor {
 
     getEdits(): Subject<PadEdit> { return this.edits; }
     getMode(): BehaviorSubject<EditorMode> { return this.mode; }
+    getKeymap(): BehaviorSubject<string> { return this.keymap; }
     isRunning(): boolean { return this.requestId !== null; }
 
     private onTick = () => {

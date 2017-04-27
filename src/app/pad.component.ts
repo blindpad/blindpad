@@ -1,3 +1,4 @@
+
 import {
     Component,
     OnInit,
@@ -12,7 +13,7 @@ import { BlindpadService } from '../services/blindpad.service';
 import { MediaService } from '../services/media.service';
 import { UserModel } from '../services/UserModel';
 import { getDescribedNoun } from '../util/Names';
-import { getModeForMime, EditorMode, MODES, KEYMAPS} from '../util/CodeMirror';
+import { getModeForMime, EditorMode, MODES, KEYMAPS } from '../util/CodeMirror';
 import { fadeInOut } from '../util/Animations';
 
 enum PadView {
@@ -104,7 +105,7 @@ export class PadComponent implements OnInit, OnDestroy {
     getPadKeymap(): string {
         const pad = this.getPad();
         if (!pad) return null;
-        return pad.getKeymap();
+        return pad.getKeymap().value;
     }
 
     onKeymapButtonClick() {
@@ -135,10 +136,10 @@ export class PadComponent implements OnInit, OnDestroy {
 
     onKeymapChoice(choice: string) {
         if (!choice || !this.hasPad()) {
-            this.visibleModeChoices = null;
+            this.visibleKeymapChoices = null;
         } else {
             this.getPad().setKeymap(choice);
-            this.visibleModeChoices = null;
+            this.visibleKeymapChoices = null;
         }
     }
 
