@@ -133,6 +133,11 @@ span.cm-def {
   background: $color-editor !important;
 }
 
+.CodeMirror-dialog-bottom {
+    position: fixed; 
+    bottom:0%;
+}
+
 // span.cm-keyword {
 //     color: $color-primary !important;
 // }
