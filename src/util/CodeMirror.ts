@@ -4,6 +4,8 @@ require('../../node_modules/codemirror/lib/codemirror.css');
 require('../../node_modules/codemirror/theme/monokai.css');
 
 require('../../node_modules/codemirror/addon/selection/active-line');
+require('../../node_modules/codemirror/addon/edit/closebrackets');
+require('../../node_modules/codemirror/addon/edit/matchbrackets');
 
 require('../../node_modules/codemirror/mode/clike/clike.js');
 require('../../node_modules/codemirror/mode/clojure/clojure.js');
@@ -119,7 +121,9 @@ export const DEFAULT_EDITOR_CONFIG = {
     styleActiveLine: true,
     autofocus: true,
     mode: DEFAULT_MODE.mime,
-    viewportMargin: Infinity
+    viewportMargin: Infinity,
+    autoCloseBrackets: true,
+    matchBrackets: true
 } as CodeMirror.EditorConfiguration;
 
 export function buildEditor(host: HTMLElement, options = DEFAULT_EDITOR_CONFIG) {
