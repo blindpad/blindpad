@@ -26,6 +26,7 @@ require('../../node_modules/codemirror/mode/perl/perl.js');
 require('../../node_modules/codemirror/mode/php/php.js');
 require('../../node_modules/codemirror/mode/python/python.js');
 require('../../node_modules/codemirror/mode/r/r.js');
+require('../../node_modules/codemirror/mode/rst/rst.js');
 require('../../node_modules/codemirror/mode/ruby/ruby.js');
 require('../../node_modules/codemirror/mode/rust/rust.js');
 require('../../node_modules/codemirror/mode/sass/sass.js');
@@ -80,6 +81,7 @@ export const MODES: EditorMode[] = filterModes([
     { name: 'Julia', mime: 'text/x-julia', children: [] },
     { name: 'MATLAB', mime: 'text/x-octave', children: [] },
     { name: 'R', mime: 'text/x-rsrc', children: [] },
+    { name: 'reStructuredText', mime: 'text/x-rst', children: [] },
     {
         name: 'SQL', children: [
             { name: 'ANSI SQL', mime: 'text/x-sql', children: [] },
