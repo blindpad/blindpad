@@ -12,6 +12,7 @@ require('../../node_modules/codemirror/mode/clojure/clojure.js');
 require('../../node_modules/codemirror/mode/coffeescript/coffeescript.js');
 require('../../node_modules/codemirror/mode/css/css.js');
 require('../../node_modules/codemirror/mode/dockerfile/dockerfile.js');
+require('../../node_modules/codemirror-mode-elixir/dist/elixir.js');
 require('../../node_modules/codemirror/mode/erlang/erlang.js');
 require('../../node_modules/codemirror/mode/elm/elm.js');
 require('../../node_modules/codemirror/mode/go/go.js');
@@ -96,6 +97,7 @@ export const MODES: EditorMode[] = filterModes([
         ]
     },
     { name: 'Dockerfile', mime: 'text/x-dockerfile', children: [] },
+    { name: 'Elixir', mime: 'text/x-elixir', children: [] },
     { name: 'Erlang', mime: 'text/x-erlang', children: [] },
     { name: 'Elm', mime: 'text/x-elm', children: [] },
     { name: 'Go', mime: 'text/x-go', children: [] },
