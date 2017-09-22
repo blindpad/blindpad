@@ -77,6 +77,55 @@
           margin-left: 16px;
         }
 
+        .keymap-button {
+          padding: 0px 12px;
+          margin-top: 0px;
+          margin-bottom: 0px;
+          height: $header-height - 1px;
+          border-radius: 0;
+          font-size: 14px;
+
+          &:after {
+            margin-left: 4px;
+            content: "\25BE";
+          }
+        }
+
+        keymap-choices {
+          position: absolute;
+          top: $header-height;
+          right: 100px;
+          background-color: $color-overlay;
+          max-height: calc(100% - #{$header-height});
+          // padding: 8px 0px;
+          overflow-y: auto;
+          z-index: 1000;
+          min-width: 86px;
+
+          keymap-choice {
+            display: block;
+            text-align: left;
+            font-size: 14px;
+            padding: 4px 12px 4px 16px;
+            cursor: pointer;
+
+            &:hover {
+              background-color: $color-primary;
+            }
+
+            &.has-children:after {
+              content: "\25B8";
+              float: right;
+            }
+
+            &.is-picked:before {
+              content: "\2713";
+              margin: 0 0 0 -12px;
+              padding: 4px 0px 4px 0px;
+            }
+          }
+        }
+
         .mode-button {
           padding: 0px 12px;
           margin-top: 0px;

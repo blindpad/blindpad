@@ -38,9 +38,11 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
     private autoEditor: AutoEditor;
     private autoEditsSub: Subscription;
     private autoModeSub: Subscription;
+    private autoKeymapSub: Subscription;
 
     private localUserId: string = null;
     private mimeSub: Subscription;
+    private keymapSub: Subscription;
     private remoteEditSub: Subscription;
     private localEdits: Observer<PadEdit[]>;
     private remoteCursorSub: Subscription;
@@ -57,6 +59,7 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
         this.autoEditor = new AutoEditor();
         this.autoEditsSub = this.autoEditor.getEdits().subscribe(edit => this.onRemoteEdits([edit]));
         this.autoModeSub = this.autoEditor.getMode().subscribe(this.setMode);
+        this.autoKeymapSub = this.autoEditor.getKeymap().subscribe(this.setKeymap);
 
         this.editor.on('changes', this.onLocalEdits);
         this.editor.on('cursorActivity', this.onLocalCursors);
@@ -98,6 +101,7 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
         if (!pad) return;
         this.localUserId = pad.getLocalUser().getId();
         this.mimeSub = pad.getMimeType().subscribe(mime => this.setMode(getModeForMime(mime)));
+        this.keymapSub = pad.getKeymap().subscribe(keymap => this.setKeymap(keymap));
         this.remoteEditSub = pad.getRemoteEdits().subscribe(this.onRemoteEdits);
         this.localEdits = pad.getLocalEdits();
         this.remoteCursorSub = pad.getRemoteCursors().subscribe(this.onRemoteCursors);
@@ -163,12 +167,17 @@ export class EditorComponent implements OnInit, OnDestroy, OnChanges {
             this.autoEditor.stop();
             this.editor.setValue('');
             this.setMode(getModeForMime(null));
+            this.setKeymap('vim');
             this.isDemoMode = false;
         }
     }
 
     private setMode = (mode: EditorMode) => {
         this.editor.setOption('mode', mode.mime);
+    }
+
+    private setKeymap = (keyMap: string) => {
+        this.editor.setOption('keyMap', keyMap);
     }
 
     private onRemoteEdits = (edits: PadEdit[]) => {
